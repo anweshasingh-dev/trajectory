@@ -1,0 +1,15 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Trajectory{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='workspace.css') }}">
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header"><a class="brand" href="{{ url_for('goals.index') }}">Trajectory<span> / a little direction, every day</span></a><span class="local-label">Local workspace</span></header>
+  <main id="main" tabindex="-1">{% block content %}{% endblock %}</main>
+  <footer>Start with a goal. Make room for the work.</footer>
+</body>
+</html>

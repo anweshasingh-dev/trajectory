@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="page-intro"><div><p class="eyebrow">Your workspace</p><h1>A place for what comes next.</h1><p class="muted">Capture an ambition and keep its details in one place.</p></div><a class="button" href="{{ url_for('goals.edit') }}">New goal</a></div>
+<div class="workspace">
+  <nav class="goal-list" aria-label="Saved goals"><h2>Goals <span class="count">{{ goals|length }}</span></h2>
+  {% for item in goals %}<a class="goal-link {% if goal and goal.id == item.id %}selected{% endif %}" {% if goal and goal.id == item.id %}aria-current="page"{% endif %} href="{{ url_for('goals.detail', goal_id=item.id) }}">{{ item.title }}</a>{% else %}<p class="muted">Your saved goals will appear here.</p>{% endfor %}
+  </nav>
+  <section class="work-area" aria-labelledby="goal-heading">
+  {% if goal %}
+    {% if saved %}<p class="notice" role="status">Goal saved.</p>{% endif %}
+    <p class="eyebrow">Goal context</p><h2 id="goal-heading">{{ goal.title }}</h2>
+    <p class="preserve">{{ goal.description }}</p>
+    <dl class="goal-details">
+    <div><dt>Desired outcome</dt><dd>{{ goal.desired_outcome or ('Not sure yet' if goal.outcome_unknown else 'Not specified yet') }}</dd></div>
+    <div><dt>Starting point</dt><dd>{{ goal.starting_point or ('Not sure yet' if goal.starting_point_unknown else 'Not specified yet') }}</dd></div>
+    <div><dt>Available time</dt><dd>{% if goal.weekly_hours is not none %}{{ '%g'|format(goal.weekly_hours) }} hours / week{% elif goal.hours_unknown %}Unknown - acknowledged{% else %}Unknown{% endif %}</dd></div>
+    <div><dt>Target date</dt><dd>{{ goal.target_date or ('No fixed deadline' if goal.no_deadline else 'Not specified') }}</dd></div>
+    </dl>
+    <section class="clarification" aria-labelledby="clarification-heading">
+      {% if questions %}
+      <h3 id="clarification-heading">A few details to clarify</h3>
+      <p class="muted">These details help shape a useful proposal. Relative dates in your description are not treated as confirmed deadlines; enter an exact date or choose no fixed deadline.</p>
+      <ul>{% for item in questions %}<li>{{ item.question }}</li>{% endfor %}</ul>
+      <a class="button" href="{{ url_for('goals.edit', goal_id=goal.id) }}">Clarify goal</a>
+      {% else %}
+      <h3 id="clarification-heading">Context ready for a proposal</h3>
+      <p class="muted">Each detail has an answer or an explicit unknown. Unknowns remain unknown; they will not become invented facts.</p>
+      {% endif %}
+    </section>
+    <a class="button secondary" href="{{ url_for('goals.edit', goal_id=goal.id) }}">Edit goal</a>
+    <p class="boundary">Saved goal context only. AI plan generation is coming in the next build slice.</p>
+  {% else %}
+    <p class="eyebrow">Begin here</p><h2 id="goal-heading">What would you like to work toward?</h2>
+    <p class="muted reading">A skill you want to learn. A project you want to finish. Start with your own words; you can fill in the details as you go.</p>
+    <a class="text-link" href="{{ url_for('goals.edit') }}">Create your first goal</a>
+  {% endif %}
+  </section>
+</div>
+{% endblock %}

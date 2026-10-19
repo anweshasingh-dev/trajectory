@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% block title %}{{ 'Edit goal' if goal else 'New goal' }} - Trajectory{% endblock %}
+{% block content %}
+<div class="form-heading"><p class="eyebrow">Goal context</p><h1>{{ 'Refine your goal.' if goal else 'Start with an ambition.' }}</h1><p class="muted">Answer what you can. For each optional detail, enter a value or explicitly choose its alternative. You can save unfinished answers.</p></div>
+<form class="goal-form" method="post" data-goal-form>
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  <input type="hidden" name="revision" value="{{ values.get('revision', 0) }}">
+  {% if errors %}<div class="notice" role="alert"><strong>Unsaved - review your entries.</strong><p>{{ errors.get('form', 'Correct the fields indicated below and save again.') }}</p>{% if goal and errors.get('form') %}<a href="{{ url_for('goals.detail', goal_id=goal.id) }}" target="_blank" rel="noopener">Open the saved goal in another tab</a>{% endif %}</div>{% endif %}
+  {% for name, label, hint, limit, rows in [('title', 'Goal title', 'A short name you will recognize.', 160, 0), ('description', 'What do you want to achieve?', 'Describe the ambition in your own words.', 6000, 4), ('desired_outcome', 'What would finished look like? (optional)', 'A concrete result you could review.', 2000, 3), ('starting_point', 'Where are you starting? (optional)', 'Relevant experience or work you have already done.', 2000, 3)] %}
+  <div class="field"><label for="{{ name }}">{{ label }}</label><p id="{{ name }}-hint" class="hint">{{ hint }}</p>
+    {% if rows %}<textarea id="{{ name }}" name="{{ name }}" rows="{{ rows }}" maxlength="{{ limit }}" {% if name == 'description' %}required{% endif %} aria-describedby="{{ name }}-hint{% if errors.get(name) %} {{ name }}-error{% endif %}" {% if errors.get(name) %}aria-invalid="true"{% endif %}>{{ values.get(name, '') or '' }}</textarea>
+    {% else %}<input id="{{ name }}" name="{{ name }}" maxlength="{{ limit }}" required value="{{ values.get(name, '') or '' }}" aria-describedby="{{ name }}-hint{% if errors.get(name) %} {{ name }}-error{% endif %}" {% if errors.get(name) %}aria-invalid="true"{% endif %}>{% endif %}
+    {% if errors.get(name) %}<p class="field-error" id="{{ name }}-error">{{ errors[name] }}</p>{% endif %}
+    {% set flag = 'outcome_unknown' if name == 'desired_outcome' else 'starting_point_unknown' if name == 'starting_point' else '' %}
+    {% if flag %}<label class="choice"><input type="checkbox" name="{{ flag }}" {% if values.get(flag) %}checked{% endif %}> I am not sure yet</label>{% endif %}
+  </div>{% endfor %}
+  <div class="form-columns">
+  <div class="field"><label for="weekly_hours">Hours per week (optional)</label><p class="hint" id="hours-hint">Your available time, not a commitment.</p><input type="number" id="weekly_hours" name="weekly_hours" min="0.01" max="168" step="any" value="{{ values.get('weekly_hours', '') if values.get('weekly_hours') is not none else '' }}" aria-describedby="hours-hint hours-error" {% if errors.get('weekly_hours') %}aria-invalid="true"{% endif %}><p class="field-error" id="hours-error">{{ errors.get('weekly_hours', '') }}</p><label class="choice"><input type="checkbox" name="hours_unknown" {% if values.get("hours_unknown") %}checked{% endif %}> I do not know yet</label></div>
+  <div class="field"><label for="target_date">Target date (optional)</label><p class="hint" id="date-hint">An intended deadline, not a forecast.</p><input type="date" id="target_date" name="target_date" value="{{ values.get('target_date', '') or '' }}" aria-describedby="date-hint date-error" {% if errors.get('target_date') %}aria-invalid="true"{% endif %}><p class="field-error" id="date-error">{{ errors.get('target_date', '') }}</p><label class="choice"><input type="checkbox" name="no_deadline" {% if values.get("no_deadline") %}checked{% endif %}> No fixed deadline</label></div>
+  </div>
+  <div class="form-actions"><button type="submit">Save goal</button><a href="{{ url_for('goals.detail', goal_id=goal.id) if goal else url_for('goals.index') }}">Cancel</a><span class="muted" data-save-status role="status"></span></div>
+</form>
+<script type="module" src="{{ url_for('static', filename='goal_form.js') }}"></script>
+{% endblock %}
