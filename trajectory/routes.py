@@ -1,6 +1,10 @@
 """Goal workspace routes; persistence and validation live in separate layers."""
 import secrets
 import sqlite3
+from uuid import uuid4
+from flask import current_app
+from . import draft_storage, planning
+from .ai import OllamaAdapter, InferenceError
 from flask import Blueprint, abort, redirect, render_template, request, session, url_for
 from pydantic import ValidationError
 from . import services, storage
@@ -18,7 +22,7 @@ def csrf_token():
 
 @bp.app_context_processor
 def template_helpers():
-    return {"csrf_token": csrf_token}
+    return {"csrf_token": csrf_token, "generation_id": lambda: str(uuid4())}
 
 
 @bp.before_request
@@ -40,7 +44,8 @@ def detail(goal_id):
     if goal is None:
         abort(404)
     return render_template("workspace.html", goals=storage.list_goals(), goal=goal,
-                           saved=request.args.get("saved") == "1", questions=questions_for(goal))
+                           saved=request.args.get("saved") == "1", questions=questions_for(goal),
+                           draft=draft_storage.latest_draft(goal_id))
 
 
 @bp.route("/goals/new", methods=["GET", "POST"])
@@ -70,3 +75,28 @@ def edit(goal_id=None):
             errors = {"form": "Unsaved: the database could not save your goal. Your entries remain below; please retry."}
             status = 503
     return render_template("goal_form.html", values=values, errors=errors, goal=goal), status
+
+
+@bp.route("/goals/<goal_id>/generate", methods=["POST"])
+def generate(goal_id):
+    goal = storage.find_goal(goal_id)
+    if goal is None:
+        abort(404)
+    try:
+        adapter = OllamaAdapter(current_app.config["OLLAMA_MODEL"],
+                                current_app.config["INFERENCE_TIMEOUT"])
+        planning.generate_draft(goal_id, int(request.form.get("revision", "0")),
+                                request.form.get("request_id", ""), adapter)
+        return redirect(url_for("goals.detail", goal_id=goal_id), code=303)
+    except (ValueError, planning.DraftConflict) as error:
+        message, status = str(error), 409
+    except InferenceError as error:
+        message, status = str(error), 502
+    except sqlite3.Error:
+        message, status = "The draft could not be saved. Your previous saved work is unchanged; please retry.", 503
+    goal = storage.find_goal(goal_id)
+    if goal is None:
+        abort(404)
+    return render_template("workspace.html", goals=storage.list_goals(), goal=goal,
+                           questions=questions_for(goal), draft=draft_storage.latest_draft(goal_id),
+                           generation_error=message), status

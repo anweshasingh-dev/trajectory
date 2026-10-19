@@ -10,6 +10,8 @@ def create_app(test_config=None):
     app.config.from_mapping(
         SECRET_KEY=secrets.token_hex(32),
         DATABASE=str(Path(app.instance_path) / "trajectory.sqlite"),
+        OLLAMA_MODEL="qwen3:4b",
+        INFERENCE_TIMEOUT=120,
         MAX_CONTENT_LENGTH=64 * 1024,
         SESSION_COOKIE_HTTPONLY=True,
         SESSION_COOKIE_SAMESITE="Lax",

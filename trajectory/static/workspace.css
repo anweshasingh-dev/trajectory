@@ -59,3 +59,10 @@ footer { max-width:1200px; margin:auto; padding:24px 32px; color:var(--muted); f
 .choice input { width:20px; height:20px; min-height:20px; flex-shrink:0; accent-color:var(--ink); }
 .clarification { border-top:1px solid var(--line); padding:24px 0; }
 .clarification h3 { margin:0 0 12px; font-size:1.125rem; }
+
+.draft-section { margin-top:32px; padding-top:24px; border-top:1px solid var(--line); overflow-wrap:anywhere; }
+.milestones { padding-left:24px; }
+.milestones>li { padding:8px 0 16px; border-top:1px solid var(--line); }
+.milestones h4 { font-size:1.125rem; margin:12px 0; }
+.proposed-task { padding:8px 0; }
+.proposed-task p { margin:4px 0; }

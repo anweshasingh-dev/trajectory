@@ -42,7 +42,8 @@ def close_db(error=None):
 
 def initialize():
     # Non-destructive bootstrap for the first schema; future changes need migrations.
-    get_db().executescript(SCHEMA)
+    from .draft_storage import SCHEMA as DRAFT_SCHEMA
+    get_db().executescript(SCHEMA + DRAFT_SCHEMA)
 
 
 def list_goals():

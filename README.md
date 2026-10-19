@@ -2,7 +2,7 @@
 
 **Turn ambition into a plan you can follow—and revise.**
 
-> **Planning stage:** Product and technical documentation exist. The application, model integration and deployment are not implemented or verified. Status reviewed on October 19, 2026.
+> **Incremental Phase 1 build:** Goal capture, clarification and restart persistence are implemented. Local AI draft generation is implemented; two real-model smoke checks passed, with evidence recorded separately. Plan editing/approval and actual-work tracking remain pending. Status reviewed on October 19, 2026.
 
 ## Overview
 
@@ -16,7 +16,7 @@ Trajectory aims to turn that description into proposed tasks and milestones, ask
 
 ## Key features
 
-**Implemented application features: none yet.** The following are planned capabilities, not working product claims.
+**Implemented:** Create/edit/reopen goals, explicit clarification answers, validated local AI draft-generation workflow, saved drafts and stale-context protection. **Pending:** Draft editing/approval, actual-work tracking and complete Phase 1 verification. The table below describes the full phase boundaries.
 
 | Scope | Planned capabilities |
 | --- | --- |
@@ -27,9 +27,9 @@ Trajectory aims to turn that description into proposed tasks and milestones, ask
 
 ## AI approach
 
-A genuine open-weight model is intended to interpret goals, suggest actionable work and ask clarifying questions. Output will be validated and presented as a proposal; only confirmed changes become accepted plans or saved commitments.
+The application sends selected goal context to a local Ollama adapter and validates structured task/milestone proposals before saving them as drafts. No generated task is approved automatically. Editing and approval are pending.
 
-The planned integration uses a replaceable backend adapter. **No model, model license or inference route has been selected or verified.** Ollama is a conditional local candidate; hosted inference or Colab may be evaluated if needed. No agent framework, vector database or full-chat archive is required for the first release.
+The selected default is Qwen3 4B through local Ollama. Its published artifact uses Apache 2.0; no model weights are bundled. Actual inference evidence is recorded in [Model_Verification.json](setup/Model_Verification.json), separately from automated fake-adapter tests. No agent framework, vector database or full-chat archive is used. See [run and model setup instructions](setup/Running.md).
 
 Scheduling constraints, data validation, persistence and numerical forecasts belong to deterministic application code. Model-generated dates are not completion forecasts. Open weights do not automatically establish license suitability, privacy, offline operation, low costs or challenge compliance. See [AI integration plans](setup/AI_Integration.md).
 
@@ -49,13 +49,13 @@ Possible monetization includes a one-time local-app purchase or paid convenience
 
 ## Current development status
 
-The repository workspace contains setup documents covering requirements, architecture, design, data, AI integration, development rules, testing, decisions and the roadmap. **P1.01 prerequisite review is In Progress; implementation tasks remain Not Started.** No application tests, model benchmarks or usability results are recorded as completed.
+The first working slices support goal capture, correction, explicit unknown/no-deadline clarification, local structured proposal generation and SQLite restart persistence. Invalid responses are rejected, changed goal context invalidates generation, and failed attempts preserve earlier saved drafts. Plan review/edit/approval and actual-work records are still pending.
 
-Before implementation, the ordered Phase 1 plan/milestone schema and AI contracts need alignment, alongside model/runtime selection and the remaining design/evaluation review. Some earlier documents still label choices open that were subsequently approved in [Tasks.md](setup/Tasks.md); that review records the later local-app/stack approval. Other proposals remain open.
+Automated tests cover goal persistence and validation, clarification, draft lifecycle and inference failure paths. These use fake adapters for repeatability; a live model smoke check is separate and does not establish broad plan quality. Older setup documents preserve earlier proposals and task statuses; [Running.md](setup/Running.md) describes the implemented slice.
 
 ## Technology stack
 
-These technologies are **approved implementation choices recorded in Tasks.md**, not installed or verified application dependencies. No dependency versions or environment setup have been established in the codebase.
+The project uses a local virtual environment and pinned direct dependencies in requirements.txt. See Running.md for the verified environment and model configuration.
 
 | Layer | Approved direction |
 | --- | --- |
@@ -63,31 +63,38 @@ These technologies are **approved implementation choices recorded in Tasks.md**,
 | Interface | Jinja templates, HTML, shared CSS and modular browser JavaScript. |
 | Persistence | SQLite through Python's sqlite3 module. |
 | Validation and testing | Pydantic and pytest. |
-| AI model/runtime | Undecided; Ollama remains a candidate, not a completed integration. |
+| AI model/runtime | Local Ollama with Qwen3 4B; replaceable adapter, validated draft output. |
 
 ## Getting started
 
-**Installation and run instructions are pending.** There is no runnable application, dependency manifest or verified start/test command yet. Cloning this repository provides the current documentation, not a working assistant.
+From the repository root in PowerShell:
 
-Start with the [product requirements](setup/Product.md) and [phased roadmap](setup/Tasks.md). Follow [project rules](setup/Rules.md) for the one-authorized-scope-at-a-time workflow. Tested installation, configuration, model setup and run instructions will be added after the implementation exists.
+```powershell
+python -m venv .venv
+.\.venv\Scripts\python.exe -m pip install -r requirements.txt
+ollama pull qwen3:4b
+.\.venv\Scripts\python.exe -m flask --app trajectory run --host 127.0.0.1
+```
+
+Open http://127.0.0.1:5000. Keep Ollama running for generation. Goal capture and saved-work browsing remain available without inference. The local database is stored in `instance/trajectory.sqlite` and excluded from Git.
+
+Run checks with `.\.venv\Scripts\python.exe -m pytest -q`. Full configuration, persistence behavior and limits are in [Running.md](setup/Running.md). This is a local single-user development app.
 
 ## Project structure
 
-Selected files currently present; this is not the proposed application scaffold:
-
 ```text
 trajectory/
-|-- README.md                 # Project introduction
-`-- setup/                    # Planning and development documentation
-    |-- Product.md            # Product vision and requirements
-    |-- Architecture.md       # Component boundaries and technical proposals
-    |-- Design.md             # Visual and interaction foundation
-    |-- AI_Integration.md     # Model integration and evaluation plans
-    |-- Tasks.md              # Phased roadmap and prerequisite review
-    `-- submission.md         # Challenge brief and submission checklist
+|-- trajectory/         # Flask factory, routes, services and SQLite storage
+|   |-- ai.py           # Local inference adapter
+|   |-- plan_models.py  # Structured proposal validation
+|   |-- templates/      # Jinja workspace and forms
+|   `-- static/         # Shared CSS and focused browser modules
+|-- tests/              # Isolated persistence and workflow regression checks
+|-- setup/              # Product references, run instructions and evidence
+`-- requirements.txt    # Pinned direct dependencies
 ```
 
-Data, testing, rules and decision documents also live in `setup/`. The application directories described in Architecture.md have not been created.
+The `instance/` database directory and `.venv/` are local and ignored by Git.
 
 ## Roadmap
 
@@ -116,7 +123,7 @@ The intended fit is a useful planning workflow built around meaningful open-weig
 | Live demo | **Pending** — local single-user app is the approved first-release direction; no hosted deployment is evidenced. |
 | Demo video | **TODO: add a verified video URL.** |
 | Screenshots | **TODO: add screenshots of the actual implemented interface.** No mock screenshot is presented as a working build. |
-| Model and license | **TODO: exact model card, artifact/version, license and verified inference setup.** |
+| Model and license | Qwen3 4B / local Ollama; see Running.md and the separately recorded live verification evidence. |
 | DEV submission | **TODO: add the published entry URL if an eligible submission is made.** |
 
 Acknowledgement of the challenge organizers: [DEV Community](https://dev.to/challenges/hacktoberfest-week2-2026-10-12). [Lucide](https://lucide.dev/) is the specified future icon system; its assets have not been integrated. Attribute the actual model, dependencies and any reused work when selected/used. A project license has not yet been supplied; this README does not assign one.

@@ -28,7 +28,7 @@
       {% endif %}
     </section>
     <a class="button secondary" href="{{ url_for('goals.edit', goal_id=goal.id) }}">Edit goal</a>
-    <p class="boundary">Saved goal context only. AI plan generation is coming in the next build slice.</p>
+    {% include "_draft.html" %}
   {% else %}
     <p class="eyebrow">Begin here</p><h2 id="goal-heading">What would you like to work toward?</h2>
     <p class="muted reading">A skill you want to learn. A project you want to finish. Start with your own words; you can fill in the details as you go.</p>

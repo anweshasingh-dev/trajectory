@@ -1,0 +1,333 @@
+{
+  "checked_at_utc": "2026-10-19T08:43:31.516909+00:00",
+  "runtime": "Ollama 0.40.6",
+  "initial_review_findings": [
+    "v1 introduced an unsupported three-week timeframe and example accuracy target.",
+    "v1 did not cover the requested README deliverable explicitly.",
+    "v1 sketching draft assumed uninterrupted availability; prompt revised to v2."
+  ],
+  "initial_cases": [
+    {
+      "input": {
+        "title": "Learn basic ML through a portfolio project",
+        "description": "Build a small reproducible tabular machine-learning project.",
+        "desired_outcome": "A repository with a baseline, evaluation and clear README.",
+        "starting_point": "Basic Python and pandas; new to ML.",
+        "weekly_hours": "5",
+        "no_deadline": "on"
+      },
+      "elapsed_seconds": 33.73,
+      "provenance": {
+        "model": "qwen3:4b",
+        "digest": "359d7dd4bcdab3d86b87d73ac27966f4dbb9f5efdfcc75d34a8764a09474fae7",
+        "prompt_version": "goal-plan-v1",
+        "total_duration_ns": 33536057200,
+        "eval_count": 540
+      },
+      "proposal": {
+        "summary": "Proposing a 3-week work plan with 2 milestones and 3 tasks each. Each task has a verifiable completion criterion. No deadlines or guarantees. Assumptions: user has basic Python/pandas, will use scikit-learn, will use a simple dataset like Iris.",
+        "assumptions": [
+          "User has basic Python and pandas knowledge",
+          "User will use scikit-learn for ML implementation",
+          "User will use a simple, publicly available dataset (e.g., Iris dataset)"
+        ],
+        "questions": [
+          "Do you have access to a dataset that's suitable for a beginner ML project?",
+          "What specific ML task do you want to focus on (classification, regression, clustering)?"
+        ],
+        "milestones": [
+          {
+            "title": "Set up project structure and data loading",
+            "completion_criterion": "Repository with .gitignore, requirements.txt, data directory containing downloaded dataset, and a data_loader.py file that loads the dataset into a pandas DataFrame",
+            "tasks": [
+              {
+                "title": "Create project directory and initialize Git",
+                "description": "Create a new directory for the project and initialize a Git repository",
+                "estimated_minutes": null
+              },
+              {
+                "title": "Download and prepare dataset",
+                "description": "Download a simple dataset (e.g., Iris) and save it in a data directory",
+                "estimated_minutes": null
+              },
+              {
+                "title": "Write data loading script",
+                "description": "Create a data_loader.py file that loads the dataset into a pandas DataFrame",
+                "estimated_minutes": null
+              }
+            ]
+          },
+          {
+            "title": "Build and evaluate baseline model",
+            "completion_criterion": "A trained model with a baseline accuracy score (e.g., 90% for Iris classification) and a simple evaluation script that prints metrics",
+            "tasks": [
+              {
+                "title": "Split data into train/test sets",
+                "description": "Split the dataset into training and testing sets using train_test_split",
+                "estimated_minutes": null
+              },
+              {
+                "title": "Train a baseline model",
+                "description": "Train a simple model (e.g., Logistic Regression) on the training data",
+                "estimated_minutes": null
+              },
+              {
+                "title": "Evaluate model performance",
+                "description": "Run evaluation on the test set and print metrics like accuracy",
+                "estimated_minutes": null
+              }
+            ]
+          }
+        ]
+      },
+      "restart_reopen_status": 200
+    },
+    {
+      "input": {
+        "title": "Start a sketching practice",
+        "description": "Explore pencil sketching without a fixed deadline.",
+        "outcome_unknown": "on",
+        "starting_point_unknown": "on",
+        "hours_unknown": "on",
+        "no_deadline": "on"
+      },
+      "elapsed_seconds": 9.94,
+      "provenance": {
+        "model": "qwen3:4b",
+        "digest": "359d7dd4bcdab3d86b87d73ac27966f4dbb9f5efdfcc75d34a8764a09474fae7",
+        "prompt_version": "goal-plan-v1",
+        "total_duration_ns": 9812766300,
+        "eval_count": 505
+      },
+      "proposal": {
+        "summary": "Proposed work plan for starting a sketching practice with no fixed deadline",
+        "assumptions": [
+          "User has access to basic sketching materials (pencil, paper)",
+          "User can dedicate at least 10 minutes per session",
+          "User has no prior sketching experience or minimal experience",
+          "User will not be interrupted by other commitments during practice sessions"
+        ],
+        "questions": [
+          "Do you have access to a pencil and paper for sketching?",
+          "How many minutes per week do you plan to spend on sketching?",
+          "What type of sketching do you want to focus on (e.g., figure drawing, landscape, abstract)?"
+        ],
+        "milestones": [
+          {
+            "title": "Initial setup",
+            "completion_criterion": "User has selected a sketching surface and pencil, and created a dedicated practice space",
+            "tasks": [
+              {
+                "title": "Identify sketching materials",
+                "description": "Select a pencil and paper for sketching",
+                "estimated_minutes": null
+              },
+              {
+                "title": "Design practice space",
+                "description": "Choose a quiet location with minimal distractions",
+                "estimated_minutes": null
+              }
+            ]
+          },
+          {
+            "title": "First session",
+            "completion_criterion": "User completed at least one 10-minute sketching session with no interruptions",
+            "tasks": [
+              {
+                "title": "Start sketching session",
+                "description": "Draw for 10 minutes without stopping",
+                "estimated_minutes": 10
+              },
+              {
+                "title": "Review session",
+                "description": "Evaluate the sketch for basic line quality and composition",
+                "estimated_minutes": 5
+              }
+            ]
+          },
+          {
+            "title": "Weekly habit formation",
+            "completion_criterion": "User completes at least one weekly sketching session with consistent practice",
+            "tasks": [
+              {
+                "title": "Schedule weekly session",
+                "description": "Set a recurring time for sketching (e.g., every Monday at 7 PM)",
+                "estimated_minutes": 5
+              },
+              {
+                "title": "Track progress",
+                "description": "Note sketch details in a journal or digital log",
+                "estimated_minutes": 3
+              }
+            ]
+          }
+        ]
+      },
+      "restart_reopen_status": 200
+    }
+  ],
+  "cases": [
+    {
+      "input": {
+        "title": "Learn basic ML through a portfolio project",
+        "description": "Build a small reproducible tabular machine-learning project.",
+        "desired_outcome": "A repository with a baseline, evaluation and clear README.",
+        "starting_point": "Basic Python and pandas; new to ML.",
+        "weekly_hours": "5",
+        "no_deadline": "on"
+      },
+      "elapsed_seconds": 9.04,
+      "provenance": {
+        "model": "qwen3:4b",
+        "digest": "359d7dd4bcdab3d86b87d73ac27966f4dbb9f5efdfcc75d34a8764a09474fae7",
+        "prompt_version": "goal-plan-v2",
+        "total_duration_ns": 8995432200,
+        "eval_count": 438
+      },
+      "proposal": {
+        "summary": "Work plan for learning basic ML through a portfolio project",
+        "assumptions": [
+          "User has basic Python and pandas knowledge",
+          "User is new to ML",
+          "User has 5 hours per week available for this project",
+          "User will not be interrupted by other commitments during these hours"
+        ],
+        "questions": [
+          "What specific tabular dataset will the user use for the project?"
+        ],
+        "milestones": [
+          {
+            "title": "Project Setup and Data Loading",
+            "completion_criterion": "Repository created with minimal requirements, dataset loaded into pandas DataFrame",
+            "tasks": [
+              {
+                "title": "Initialize Git repository",
+                "description": "Create a new directory and initialize Git",
+                "estimated_minutes": null
+              },
+              {
+                "title": "Load a tabular dataset",
+                "description": "Read a CSV file into a pandas DataFrame",
+                "estimated_minutes": null
+              }
+            ]
+          },
+          {
+            "title": "Model Selection and Baseline Evaluation",
+            "completion_criterion": "Baseline model trained and evaluated on the dataset",
+            "tasks": [
+              {
+                "title": "Choose a simple model",
+                "description": "Select a model like Logistic Regression or Decision Tree",
+                "estimated_minutes": null
+              },
+              {
+                "title": "Train and evaluate baseline model",
+                "description": "Split data into train/test, train model, compute metrics",
+                "estimated_minutes": null
+              }
+            ]
+          },
+          {
+            "title": "Documentation and Finalization",
+            "completion_criterion": "Clear README with project details and instructions",
+            "tasks": [
+              {
+                "title": "Write README",
+                "description": "Document project setup, data, model, and results",
+                "estimated_minutes": null
+              },
+              {
+                "title": "Verify reproducibility",
+                "description": "Ensure all steps can be run from scratch with the provided code",
+                "estimated_minutes": null
+              }
+            ]
+          }
+        ]
+      },
+      "restart_reopen_status": 200
+    },
+    {
+      "input": {
+        "title": "Start a sketching practice",
+        "description": "Explore pencil sketching without a fixed deadline.",
+        "outcome_unknown": "on",
+        "starting_point_unknown": "on",
+        "hours_unknown": "on",
+        "no_deadline": "on"
+      },
+      "elapsed_seconds": 9.63,
+      "provenance": {
+        "model": "qwen3:4b",
+        "digest": "359d7dd4bcdab3d86b87d73ac27966f4dbb9f5efdfcc75d34a8764a09474fae7",
+        "prompt_version": "goal-plan-v2",
+        "total_duration_ns": 9542283100,
+        "eval_count": 487
+      },
+      "proposal": {
+        "summary": "User wants to start a sketching practice without a fixed deadline. They haven't provided desired outcome, starting point, or other details. Need to ask questions to clarify.",
+        "assumptions": [
+          "User has access to basic sketching materials (pencil, paper, etc.)",
+          "User is willing to engage in short, regular sketching sessions",
+          "User understands that sketching practice requires consistent effort without strict deadlines"
+        ],
+        "questions": [
+          "What is your desired outcome for this sketching practice? (e.g., improve drawing skills, create a portfolio, just for fun)",
+          "What is your current skill level in sketching? (e.g., beginner, intermediate, experienced)",
+          "How much time can you realistically dedicate to sketching each week? (e.g., 15 minutes, 30 minutes, 1 hour)"
+        ],
+        "milestones": [
+          {
+            "title": "Set up basic sketching environment",
+            "completion_criterion": "User has a dedicated sketching space with at least a pencil and paper available for immediate use",
+            "tasks": [
+              {
+                "title": "Identify and gather essential sketching materials",
+                "description": "Find a pencil and paper (or digital equivalent) that you can use right away",
+                "estimated_minutes": null
+              },
+              {
+                "title": "Design a simple sketching routine",
+                "description": "Create a short, repeatable sketching session plan (e.g., 5 minutes daily) that fits your current schedule",
+                "estimated_minutes": null
+              }
+            ]
+          },
+          {
+            "title": "Complete first sketching session",
+            "completion_criterion": "User has created at least one sketch that demonstrates basic drawing skills (e.g., simple shapes, lines)",
+            "tasks": [
+              {
+                "title": "Sketch a simple shape",
+                "description": "Draw one basic shape (e.g., circle, square) on paper using a pencil",
+                "estimated_minutes": null
+              },
+              {
+                "title": "Review and reflect on the sketch",
+                "description": "Briefly assess the sketch for accuracy and identify one area to improve next time",
+                "estimated_minutes": null
+              }
+            ]
+          }
+        ]
+      },
+      "restart_reopen_status": 200
+    }
+  ],
+  "manual_review": {
+    "result": "Integration smoke check passed; human review of suggestions remains required.",
+    "v2_improvements": [
+      "No invented plan duration or accuracy target in reviewed v2 examples.",
+      "ML draft now includes README and reproducibility tasks."
+    ],
+    "remaining_limitations": [
+      "The model may repeat known facts in proposed assumptions.",
+      "The ML draft still proposes uninterrupted availability despite the prompt; this is visible as an unconfirmed assumption, not saved user context.",
+      "The sketching draft suggests an optional routine despite unknown hours; it is not an accepted schedule.",
+      "Most effort estimates were null. No inference-quality or deadline-feasibility guarantee is established."
+    ],
+    "gpu_observation": "ollama ps reported 100% GPU, 8192 context, 3.9 GB loaded memory.",
+    "automated_regression_result": "35 passed"
+  }
+}

@@ -1,0 +1,27 @@
+<section class="draft-section" aria-labelledby="draft-heading">
+  {% if generation_error %}<div class="notice" role="alert">{{ generation_error }}</div>{% endif %}
+  <h3 id="draft-heading">Proposed work plan</h3>
+  <p class="muted">AI suggestions stay drafts. Review assumptions and estimates; no tasks are approved or scheduled.</p>
+  {% if not questions %}
+  <form method="post" action="{{ url_for('goals.generate', goal_id=goal.id) }}" data-generation-form>
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <input type="hidden" name="revision" value="{{ goal.revision }}">
+    <input type="hidden" name="request_id" value="{{ generation_id() }}">
+    <button type="submit">{{ 'Generate another draft' if draft else 'Generate proposal' }}</button>
+    <p class="muted" role="status" data-generation-status>Uses a local model. Generation may take up to two minutes.</p>
+  </form>
+  {% else %}<p class="muted">Answer the clarification questions above to generate a proposal.</p>{% endif %}
+  {% if draft %}
+    <p class="eyebrow">Draft / {{ draft.provenance.model }}</p>
+    {% if draft.source_revision != goal.revision %}<p class="notice">Outdated draft: the goal has changed since generation. Generate a new proposal using the current context.</p>{% endif %}
+    <p class="preserve">{{ draft.proposal.summary }}</p>
+    {% if draft.proposal.assumptions %}<h4>Proposed assumptions</h4><ul>{% for note in draft.proposal.assumptions %}<li>{{ note }}</li>{% endfor %}</ul>{% endif %}
+    {% if draft.proposal.questions %}<h4>Questions to review</h4><ul>{% for note in draft.proposal.questions %}<li>{{ note }}</li>{% endfor %}</ul>{% endif %}
+    <ol class="milestones">{% for milestone in draft.proposal.milestones %}
+      <li><h4>{{ milestone.title }}</h4><p><strong>Checkpoint:</strong> {{ milestone.completion_criterion }}</p>
+      <ol>{% for task in milestone.tasks %}<li class="proposed-task"><strong>{{ task.title }}</strong><p>{{ task.description }}</p><p class="muted">Suggested effort: {% if task.estimated_minutes is none %}Unknown{% else %}{{ task.estimated_minutes }} minutes{% endif %}</p></li>{% endfor %}</ol></li>
+    {% endfor %}</ol>
+    <p class="boundary">Draft saved locally. Editing and approval will be added in the next slice.</p>
+  {% endif %}
+</section>
+<script type="module" src="{{ url_for('static', filename='generation.js') }}"></script>
