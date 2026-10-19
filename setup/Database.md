@@ -1,15 +1,15 @@
 ﻿# Trajectory — Database Proposal
 
-> **Status: Proposed schema for review, not an implemented database.**
-> Based on `setup/Product.md` and the approved `setup/Architecture.md`. Approval of architecture does not resolve choices that it labels OPEN DECISION. This document creates no tables, migrations, code, or application files. `setup/Design.md` remains deferred.
+> **Status: Proposed data catalogue for review, not a description of the implemented schema.** Running.md describes the current SQLite tables; this update creates no migrations.
+> Based on `setup/Product.md` and the approved `setup/Architecture.md`. Approval of architecture does not resolve choices that it labels OPEN DECISION. This document creates no tables, migrations, code, or application files. `setup/Design.md` remains outside this alignment scope.
 
 ## 1. Read this first
 
-**Recommendation:** Use the architecture's SQLite/sqlite3 approach for a local, single-user MVP, subject to the existing deployment decision. Keep ordinary facts in relational tables; reserve validated JSON for temporary proposals and source references.
+**Confirmed direction:** SQLite/sqlite3 for a local, single-user Phase 1 app, as approved in Tasks.md. The detailed schema below remains proposed and spans later phases; it is not a 12-table MVP requirement. Keep ordinary facts in relational tables; reserve validated JSON for temporary proposals and source references.
 
 | Label | Meaning here |
 | --- | --- |
-| MVP data | Needed if Product.md's proposed planning loop and minimal navigator slice are approved. This label does not approve that scope. |
+| Phased data | Phase 1 needs goal/milestone/task proposals, accepted non-calendar plans and actual work. Daily capacity/plans are Phase 2; trajectory context is Phase 3. Catalogue detail is still a proposal. |
 | Proposed rule | A concrete recommendation that still needs review before implementation. |
 | Future | Not required for the initial schema; add only after scope approval. |
 | OPEN DECISION | A choice that affects data meaning or delivery and remains unsettled. |
@@ -36,7 +36,7 @@ flowchart LR
     P --> X[Deletion request status]
 ```
 
-Arrows show the main ownership/reference paths, not every FK. The tables below are authoritative. Personal context supports planning but never supplies authoritative numerical forecasts.
+Arrows show the main ownership/reference paths, not every FK. The tables below define this proposal only; they are not authoritative for the implemented schema. Personal context supports planning but never supplies authoritative numerical forecasts.
 
 ## 2. Shared conventions
 
@@ -49,7 +49,15 @@ Arrows show the main ownership/reference paths, not every FK. The tables below a
 - **Ownership:** Each owned row carries `profile_id INTEGER NN FK -> profile.id`, except link/block rows whose owner is derived through their plan. Services enforce the same profile on every linked record. A single-user profile is not authentication or a multi-user security design.
 - **FK defaults:** Unless specified otherwise, deletion is RESTRICT and key updates are RESTRICT. RESTRICT blocks deletion until the service has explicitly handled dependents. CASCADE below means deleting owned child rows automatically; it never authorizes deleting a user's data without an explicit action.
 
-## 3. MVP table catalogue
+## 3. Phased table catalogue
+
+### Phase 1 relationships and remaining schema review
+
+Phase 1 requires persistent goals linked to meaningful milestones/checklists and actionable master tasks, ordered draft/accepted goal plans, exact acceptance/version history and correctable actual-work records. A goal plan must not require a calendar date, requested daily minutes or scheduled blocks. Tasks need stable identities across plan membership so unfinished work and contributions survive replacement and restart.
+
+The existing Sections 3.7–3.9 describe **Phase 2 daily scheduling only**; they cannot stand in for this non-calendar goal-plan relationship. Running.md documents the current draft JSON, approved snapshots and task membership. A reviewed schema change must account for those existing records instead of assuming this catalogue is already implemented. Dedicated milestone identity, checklist state, task-to-milestone linkage and progress roll-up remain OPEN DECISION; no new tables/columns are selected here.
+
+Required contribution semantics: record completion, partial progress, blockers, actual time and optional accomplishment/learning notes against persistent tasks and their milestone context. Work logs are distinct from planned allocations and task state; recorded work informs progress under approved update rules. Elapsed time alone never completes a task or milestone.
 
 ### A. Personal trajectory and organized work
 
@@ -77,7 +85,7 @@ No account, password, or email fields are proposed. Before public multi-user acc
 | `status` | TEXT NN; active / paused / completed / archived | Organization state. |
 | Common columns | As Section 2 | Correction metadata. |
 
-Proposed simplification: no nested project hierarchy or separate learning-roadmap graph in the MVP. Multiple career interests live in context records and may relate to work items.
+Proposed simplification: no general nested project hierarchy or separate learning-roadmap graph in Phase 1. This does not remove the required goal-to-milestone-to-task relationships described above. Multiple career interests live in context records and may relate to work items.
 
 #### 3.3 `tasks` — actionable workload
 
@@ -133,9 +141,11 @@ This shared table reduces one-table-per-context-type overhead. The trade-off is 
 | `context_record_id` | TEXT NULL FK -> context_records.id, RESTRICT | Optional related interest/decision. |
 | Common columns | As Section 2 | Correction metadata. |
 
-Either, both, or neither relationship may be present. Proposed MVP limit: one work link and one context link per resource; many-to-many resource tagging is future scope. A course work item tracks workload; its resource link identifies learning material, avoiding duplicate progress totals.
+Either, both, or neither relationship may be present. Proposed catalogue limit: one work link and one context link per resource; many-to-many resource tagging is future scope. A course work item tracks workload; its resource link identifies learning material, avoiding duplicate progress totals.
 
 ### B. Capacity, plans, and actual work
+
+Sections 3.6–3.9 are Phase 2 proposals; Section 3.10 describes actual-work semantics needed from Phase 1, with optional scheduled-block linkage added later. Context records in 3.4 and navigator resource use in 3.5 belong to Phase 3, not MVP prerequisites.
 
 #### 3.6 `time_windows` — availability and reserved commitments
 
@@ -168,6 +178,8 @@ Calculate capacity from the union of availability intervals minus the union of c
 | `accepted_at` | TEXT NULL | Required for accepted/superseded plans; retained if later invalidated. |
 | `acceptance_key` | TEXT NULL UNIQUE | Server-issued idempotency token; required after acceptance. |
 | Common columns | As Section 2 | Draft corrections/version. |
+
+A new day creates a separate daily plan referencing existing persistent tasks; it does not reset task/milestone progress or copy unfinished master tasks. Preserve historical planned allocations and independently recorded contributions. Next-day proposals use remaining work, blockers, changed deadlines and available capacity; replacement still requires approval. Detailed carry-forward and minimum-session rules remain open.
 
 At most one accepted plan per `(profile_id, plan_date)` via a proposed unique partial index on accepted rows. A replacement atomically supersedes the old accepted row and accepts the new one. Never mutate historical accepted blocks as if the original plan had been different. Accepted plans may later be invalidated by deletion; retain acceptance metadata without making them current again.
 
@@ -206,9 +218,9 @@ No common columns: the owning plan controls edits and versioning. Multiple block
 | `notes` | TEXT NULL | Optional user-entered observation. |
 | Common columns | As Section 2 | Correctable measurement, not an immutable audit event. |
 
-Require positive minutes or positive completed quantity; reject empty entries. Service verifies that an optional block belongs to this task/profile. Unit changes are restricted as in Section 3.3. Logging an unscheduled task is valid. Deleting a plan removes the optional association, not the independently recorded actual work.
+Proposed measurement rule: require positive minutes or positive completed quantity; reject empty entries. **OPEN GAP:** This rule alone cannot represent a blocker-only, completion-only or notes-only contribution. Review that distinction before actual-work implementation; it must not force invented time/quantity or discard those required records. Service verifies that an optional block belongs to this task/profile. Unit changes are restricted as in Section 3.3. Logging an unscheduled task is valid. Deleting a plan removes the optional association, not the independently recorded actual work.
 
-Forecasts are derived, not authoritative database rows in this MVP. Calculate from validated progress, remaining workload, and explicit future-capacity assumptions; expose the formula/version and missing data in the result. Do not sum incompatible task units into a goal total. Goal roll-up and rate estimation remain OPEN DECISION; without comparable evidence return an unavailable estimate. Historical forecast snapshots can be added later if approved.
+Forecasts are Phase 2 derived results, not authoritative database rows in this proposal. Calculate from validated progress, remaining workload, and explicit future-capacity assumptions; expose the formula/version and missing data in the result. Do not sum incompatible task units into a goal total. Goal roll-up and rate estimation remain OPEN DECISION; without comparable evidence return an unavailable estimate. Historical forecast snapshots can be added later if approved.
 
 ### C. Approval and deletion lifecycle
 
@@ -264,7 +276,7 @@ Review exact change -> confirm when required -> check row version
     -> invalidate affected drafts/derived context -> commit -> recalculate
 ```
 
-Proposed conservative MVP policy: any authoritative change invalidates all pending AI proposals and draft plans for this profile, and marks all summaries stale. This may request unnecessary regeneration but avoids a complex dependency engine. Do not treat a summary as current unless its source revision still matches. When confirming a new or corrected summary, validate its input revision first, invalidate older derived records, then stamp that summary with the resulting committed profile revision so its own save does not immediately make it stale. Accepted schedules remain historical records; revalidate their feasibility when inputs change and require explicit approval for a replacement. Source references must also be rechecked before returning in-flight advice.
+Proposed conservative policy for the later shared-profile catalogue (not an assertion about current implementation): any authoritative change invalidates all pending AI proposals and draft plans for this profile, and marks all summaries stale. This may request unnecessary regeneration but avoids a complex dependency engine. Do not treat a summary as current unless its source revision still matches. When confirming a new or corrected summary, validate its input revision first, invalidate older derived records, then stamp that summary with the resulting committed profile revision so its own save does not immediately make it stale. Accepted schedules remain historical records; revalidate their feasibility when inputs change and require explicit approval for a replacement. Source references must also be rechecked before returning in-flight advice.
 
 Correcting progress updates that row rather than storing a hidden copy of the incorrect observation; recalculate forecasts. Do not overwrite accepted schedule history to match actual work. Important goal/commitment changes require confirmation; exact boundaries remain OPEN DECISION. Archiving retains information and is not deletion; archived facts must not be selected as current priorities.
 
@@ -311,15 +323,15 @@ Ordered, reviewed migrations should track a schema version and preserve user dat
 
 Later tests must cover FK enforcement per connection, invalid values/relationships, atomic rollback, version conflicts, duplicate acceptance, one accepted plan/date, restart persistence, progress correction, capacity union, and source/deletion invalidation. No executable schema, migrations, tests, or database were created or run for this proposal.
 
-## 8. MVP boundary and future data
+## 8. Phase boundaries and future data
 
-| Initial data if MVP approved | Future only; no tables proposed now |
+| Data by phase; detailed schema still proposed | Future only; no tables proposed now |
 | --- | --- |
-| Work/tasks, resource links, local time rules | External calendar sync and rich recurrence/exceptions |
-| Daily plans, considered tasks, scheduled blocks, actual progress | Multi-day roadmap graphs and historical forecast snapshots |
-| Multiple interests, preferences, confirmed decisions/detours, approved summaries | Broad conversation/note retrieval and embedding indexes |
+| Phase 1: goals, milestone/task links, accepted ordered plans and actual work; Phase 2: broader work/resources and local time rules | External calendar sync and rich recurrence/exceptions |
+| Phase 2: daily plans, considered tasks and scheduled blocks linked to persistent tasks/actual work | Multi-day roadmap graphs and historical forecast snapshots |
+| Phase 3: multiple interests, preferences, confirmed decisions/detours and approved summaries | Broad conversation/note retrieval and embedding indexes |
 | Temporary exact-change proposals and deletion status | Collaboration, accounts, permissions and multiple users |
-| Validated progress and remaining effort | Sketches and creative-practice journal storage |
+| Validated progress and remaining effort | Phase 4 Sketch Journal; media/storage/privacy and vision-model decisions explicitly open (Product.md Section 6) |
 
 No persistent “distraction score” or automatic career-path classification is proposed. Alignment advice is a contextual interpretation, not an authoritative user attribute.
 
@@ -327,11 +339,11 @@ No persistent “distraction score” or automatic career-path classification is
 
 | OPEN DECISION | Recommendation to review |
 | --- | --- |
-| User/deployment boundary | Local singleton profile first; hosted multi-user access requires a revised ownership/authentication model. |
-| MVP approval | Confirm the minimal navigator slice and these supporting data groups; schema approval alone does not promote future features. |
+| Later deployment | Local single-user scope is confirmed; the singleton profile remains a schema proposal. Hosted multi-user access needs revised ownership/authentication approval. |
+| Phase 1 relationships | Review non-calendar ordered plans, milestone identity/checklists, task membership/history and contribution updates against current storage. No daily-plan or navigator tables are required to begin Phase 1. |
 | Progress measurement | Task-specific units plus separate minutes; approve precision, remaining-work correction policy, forecast rate evidence and goal roll-up. |
 | Time semantics | Approve IANA timezone handling, weekly/one-off recurrence, midnight splitting, DST policy, and parent/task deadline precedence. |
-| Plan lifecycle | Daily plans, one accepted plan/date, immutable historical schedule details, and conservative stale-draft invalidation. |
+| Plan lifecycle | Review Phase 1 goal-plan acceptance and stable task membership separately from Phase 2 daily plans/one accepted plan per date. Confirm carry-forward, dependency and minimum-session semantics; preserve histories and actual work. |
 | Context structure | Typed shared context table; approve important-change boundaries, summary provenance and review-date behavior. |
 | Retention/deletion | Approve proposal expiry, historical-record deletion choices, completed request metadata retention, backup expiry and external-provider handling. |
 | Persistence setup | Confirm SQLite on the actual deployment storage, supported version, migrations and durable backup/restore process. |

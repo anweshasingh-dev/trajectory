@@ -1,0 +1,7 @@
+<p class="preserve">{{ proposal.summary }}</p>
+{% if proposal.assumptions %}<h4>Proposed assumptions to review</h4><ul>{% for note in proposal.assumptions %}<li>{{ note }}</li>{% endfor %}</ul>{% endif %}
+{% if proposal.questions %}<h4>Questions to review</h4><ul>{% for note in proposal.questions %}<li>{{ note }}</li>{% endfor %}</ul>{% endif %}
+<ol class="milestones">{% for milestone in proposal.milestones %}
+  <li><h4>{{ milestone.title }}</h4><p><strong>Checkpoint:</strong> {{ milestone.completion_criterion }}</p>
+  <ol>{% for task in milestone.tasks %}<li class="proposed-task"><strong>{{ task.title }}</strong><p>{{ task.description }}</p><p class="muted">Suggested effort: {% if task.estimated_minutes is none %}Unknown{% else %}{{ task.estimated_minutes }} minutes{% endif %}</p></li>{% endfor %}</ol></li>
+{% endfor %}</ol>

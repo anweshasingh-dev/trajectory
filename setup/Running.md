@@ -1,6 +1,6 @@
 # Running the first application slice
 
-Implemented: create, list, reopen and edit goals; deterministic clarification questions and explicit unknown/no-deadline answers with SQLite persistence, input validation and stale-edit protection. This is an incremental build, not the complete Phase 1 MVP. Local model generation and persistent draft display are implemented. Draft editing/approval, progress logging and deletion are not implemented yet.
+Implemented: create, list, reopen and edit goals; deterministic clarification questions and explicit unknown/no-deadline answers with SQLite persistence, input validation and stale-edit protection. This is an incremental build, not the complete Phase 1 MVP. Local model generation and persistent draft display are implemented. Draft editing, rejection and approval are implemented. Progress logging and deletion are not implemented yet.
 
 Verified environment: Windows, Python 3.14.5. From the repository root in PowerShell:
 
@@ -44,7 +44,7 @@ Open a goal, resolve each context question with a value or explicit alternative,
 
 Plans are ordered milestones, each with a completion criterion and ordered tasks. Effort estimates are suggestions; unknown estimates remain null. Assumptions and remaining model questions are visible. Validation proves structure and bounds, not factual accuracy or practical plan quality. Users must review the content.
 
-An additive `plan_drafts` table stores the draft JSON, goal source revision, model name/digest, prompt version and returned performance counters. No accepted-task tables are created. Earlier drafts are retained; the workspace displays the most recently saved draft and labels it outdated if goal context changed. A replacement attempt does not erase a previous draft when inference fails. Source revision is checked again atomically when saving, so a result generated against changed/deleted goal context is rejected. Reposting the same generation request ID cannot create duplicate drafts. Editing and approval are the next build slice.
+An additive `plan_drafts` table stores the draft JSON, goal source revision, model name/digest, prompt version and returned performance counters. Generation alone creates no approved tasks; Part 4 approval creates the separate approved-plan/task records described below. Earlier drafts are retained; the workspace displays the most recently saved draft and labels it outdated if goal context changed. A replacement attempt does not erase a previous draft when inference fails. Source revision is checked again atomically when saving, so a result generated against changed/deleted goal context is rejected. Reposting the same generation request ID cannot create duplicate drafts. Editing and approval are available through the Part 4 review workflow.
 
 Tests use fake model adapters for repeatable failure checks. Real model results, once recorded, are separate evidence; one successful example is a smoke check, not a broad quality evaluation. Configuration defaults are in the application factory; runtime-specific details stay in `trajectory/ai.py`.
 
@@ -53,3 +53,20 @@ Tests use fake model adapters for repeatable failure checks. Real model results,
 [Model_Verification.json](Model_Verification.json) records the exact local digest, synthetic inputs, responses, timings, prompt versions and manual findings. Two v2 live requests completed in 9.04 and 9.63 seconds; both saved drafts reopened after a fresh application instance. A cold v1 request took 33.73 seconds. Ollama reported full GPU execution with an 8,192-token context and 3.9 GB loaded memory. These are observations on this machine, not latency promises.
 
 The first content review found an unsupported duration and accuracy example; prompt v2 removed those from the reviewed outputs and added the requested documentation deliverable. Residual model limitations remain: known facts can be repeated as assumptions, and availability/routine assumptions may still be proposed. They remain visibly unconfirmed and never update goal context. Most reviewed effort estimates were unknown. Review all generated suggestions before using them. All 35 automated regression cases passed separately.
+
+## Draft editing and approval (Part 4)
+
+1. Open a generated draft and choose **Edit draft**. Revise the summary, assumptions/questions, milestone checkpoints and task text/effort. Add/remove/reorder milestones and tasks through labeled buttons. Limits remain four milestones and five tasks per milestone; each milestone needs at least one task. Blank effort stays unknown.
+2. Choose **Save draft for review**. This revalidates and saves a new draft revision, then returns to the workspace. Saving is separate from approval. Cancel leaves the saved revision intact; the browser warns before leaving unsaved edits.
+3. Review the saved proposal, confirm the review checkbox, then choose **Approve this plan**. If there is an existing approved plan, **Approve replacement plan** explicitly replaces it and retains the historical snapshot. Assumptions remain proposed assumptions; approval does not turn them into goal facts or a daily schedule.
+4. Alternatively, expand **Reject this draft**, confirm rejection, and submit. Rejection preserves any current approved plan and does not delete the draft record.
+
+Approval, rejection and draft edits recheck the goal source revision and draft revision inside a short `BEGIN IMMEDIATE` transaction. Approval also compares the current approved-plan ID to the version shown during review. A competing approval requires fresh review. Duplicate approval acknowledges the same current snapshot without adding tasks or reactivating a superseded plan. No inference runs inside a database write transaction. Failures roll back every change.
+
+The additive tables are `draft_reviews`, `approved_plans`, `approved_tasks` and `approved_plan_tasks`; existing goal/draft rows are preserved. Older drafts without a review row are read as revision 1 in Draft state. Approved snapshots are immutable and one plan per goal can be current. Original AI provenance is retained, while the approved draft revision identifies the human-reviewed content.
+
+Unchanged tasks in an immediately preceding current plan retain their IDs, matched by exact title, description and suggested effort, in prior order for duplicates. A changed task gets a new identity; removed tasks are archived rather than deleted. Historical memberships and snapshots remain. Moving an unchanged task between milestones preserves its identity. Progress records are not yet implemented; future corrections must preserve this distinction.
+
+A changed goal labels the existing approved plan as needing review rather than deleting it. Old-source drafts cannot be edited or approved. Open questions/assumptions remain visible; users can revise or remove them before approval. The editor does not change confirmed goal context.
+
+Verification: 50 automated cases pass, including rejection, stale/duplicate/concurrent approval, invalid edited data, exact-revision persistence, retained task identity and rollback after a partial replacement attempt. An isolated headless Chrome check passes add/remove/reorder, input naming, bounds and entered-data retention. [Review_Verification.json](Review_Verification.json) records the separate real-model edit/approve/restart smoke check. This is not a broad visual accessibility audit or a quality guarantee for model suggestions.

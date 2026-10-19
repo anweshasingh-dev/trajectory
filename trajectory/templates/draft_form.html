@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% from '_editor_fields.html' import milestone_editor, task_editor %}
+{% block title %}Edit draft - Trajectory{% endblock %}
+{% block content %}
+<div class="form-heading"><p class="eyebrow">{{ goal.title }} / draft revision {{ revision }}</p><h1>Make the plan your own.</h1><p class="muted">Edit the proposal, then save and review it before approval. Up to four milestones and five tasks per milestone.</p></div>
+<form method="post" class="goal-form draft-editor" data-draft-editor>
+<input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><input type="hidden" name="revision" value="{{ revision }}">
+{% if error %}<div class="notice" role="alert"><strong>Unsaved.</strong><p>{{ error }}</p><a href="{{ url_for('goals.detail', goal_id=goal.id) }}" target="_blank" rel="noopener">Open saved work in another tab</a></div>{% endif %}
+<div class="field"><label for="summary">Plan summary</label><textarea id="summary" name="summary" rows="3" required maxlength="1200">{{ values.summary }}</textarea></div>
+{% for key, label in [('assumptions','Proposed assumptions (one per line)'), ('questions','Open questions (one per line)')] %}
+<div class="field"><label for="{{ key }}">{{ label }}</label><p class="hint">Up to six entries of 500 characters. Remove or resolve suggestions you do not accept; these entries never change your goal context.</p><textarea id="{{ key }}" name="{{ key }}" rows="3" maxlength="3006">{{ values[key]|join('
+') }}</textarea></div>
+{% endfor %}
+<input type="hidden" name="milestone_count" value="{{ values.milestones|length }}">
+<div data-milestones>{% for milestone in values.milestones %}{{ milestone_editor(milestone, loop.index0) }}{% endfor %}</div>
+<button class="secondary" type="button" data-action="add-milestone">Add milestone</button>
+<p class="muted" data-editor-status role="status" aria-live="polite"></p>
+<div class="form-actions"><button type="submit">Save draft for review</button><a href="{{ url_for('goals.detail', goal_id=goal.id) }}">Cancel</a></div>
+</form>
+<template id="task-template">{{ task_editor({}, 0, 0) }}</template>
+<template id="milestone-template">{{ milestone_editor({'tasks':[{}]}, 0) }}</template>
+<script type="module" src="{{ url_for('static', filename='draft_editor.js') }}"></script>
+{% endblock %}

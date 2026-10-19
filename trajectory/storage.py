@@ -41,9 +41,12 @@ def close_db(error=None):
 
 
 def initialize():
-    # Non-destructive bootstrap for the first schema; future changes need migrations.
+    # Bootstrap original schemas, then apply versioned live-work migrations.
     from .draft_storage import SCHEMA as DRAFT_SCHEMA
-    get_db().executescript(SCHEMA + DRAFT_SCHEMA)
+    from .review_storage import SCHEMA as REVIEW_SCHEMA
+    get_db().executescript(SCHEMA + DRAFT_SCHEMA + REVIEW_SCHEMA)
+    from .work_migrations import migrate
+    migrate()
 
 
 def list_goals():

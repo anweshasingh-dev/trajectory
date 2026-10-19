@@ -1,7 +1,7 @@
 ﻿# Trajectory — Architecture
 
-Status: Proposed architecture for review; no stack, model, or deployment choice is finalized.
-Source of truth: `setup/Product.md`. The current request authorizes this document before `setup/Design.md`, which is intentionally deferred. Product.md retains its own proposed-MVP and open-decision labels; this document does not silently approve them.
+Status: Architecture responsibilities remain a proposal where labeled. Local single-user Phase 1 and Python/Flask/Jinja/SQLite/sqlite3/Pydantic/pytest are approved in Tasks.md; this alignment authorizes no implementation.
+Source of truth: `setup/Product.md`, with release allocation in `setup/Tasks.md`. Existing `setup/Design.md` owns visual direction and remains outside this alignment scope. Detailed technical proposals are not approved merely by this update.
 
 ## A. Architecture Overview
 
@@ -18,13 +18,13 @@ Browser: templates + reusable UI + page-specific CSS/JavaScript
 
 The browser never talks directly to the model or database. Application services, rather than the model, authorize and persist changes. Modules receive explicit dependencies and inputs; avoid scattered mutable global state. Configuration and connection factories may be shared through the application factory.
 
-**Initial architectural target, subject to MVP approval:** Work and commitment management; natural-language proposals; editable daily plans; actual progress; evidence-based forecasts; a compact trajectory profile; resource links; confirmed decisions and detours; and grounded alignment explanations.
+**Phase 1 target:** Goal capture/clarification, bounded task/milestone proposals, editable ordered goal plans, exact approval, persistent tasks and actual-work tracking with restart persistence. **Phase 2** adds competing commitments, daily schedules, overload, planned-versus-actual and evidence-based forecasts. **Phase 3** adds the trajectory profile, resources, decisions, detours and grounded alignment explanations. The components below describe responsibilities across these phases, not a requirement to build all modules in Phase 1.
 
-**Future extensions:** Broad historical-note/conversation retrieval, longer-term roadmap suggestions, and richer exploration reviews. Support these through existing context and AI interfaces only when approved; do not build unused infrastructure now. The creative-practice journal remains future scope. No visual layouts, animations, transitions, or detailed screen journeys are settled here.
+**Future extensions:** Broad historical-note/conversation retrieval, longer-term roadmap suggestions, and richer exploration reviews. Support these through existing context and AI interfaces only when approved; do not build unused infrastructure now. The Sketch Journal/artistic development module remains Phase 4; its architecture, storage, privacy and vision-model integration are open. See Product.md Section 6 for retained behavior. No visual layouts, animations, transitions, or detailed screen journeys are settled here.
 
 ## B. Proposed Technology Stack
 
-All entries below are **PROPOSED**, not confirmed decisions. Versions must be selected and pinned after approval and compatibility checks.
+Python, Flask/Jinja, modular browser assets, Pydantic, SQLite/sqlite3 and pytest are **CONFIRMED direction** in Tasks.md. Detailed component design remains proposed. Existing pinned versions and local model evidence are documented in requirements.txt and setup/Running.md; this update does not change or reverify them. Ollama's earlier candidate discussion below is retained as selection rationale, not current selection status.
 
 | Choice                                                                        | Responsibility and reason                                                                                                                 | Limits and trade-offs                                                                                                                                 |
 | ----------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -38,11 +38,11 @@ All entries below are **PROPOSED**, not confirmed decisions. Versions must be se
 
 Flask supports the proposed factory pattern and templates; see its [application factories](https://flask.palletsprojects.com/en/stable/patterns/appfactories/) and [quickstart](https://flask.palletsprojects.com/en/stable/quickstart/). These capabilities support the recommendation, not a claim that it is the only suitable framework.
 
-**Alternatives evaluated:** FastAPI offers integrated validation and API documentation, making it attractive if a separate API or multiple clients become central; see its [official features](https://fastapi.tiangolo.com/features/). Flask is preferred provisionally for this small server-rendered app. Django is worth revisiting if accounts and administrative workflows dominate, but is not the current recommendation. A React frontend adds a build and client-state layer whose need is not established by Product.md. No agent framework, queue, microservices, or vector database is initially justified.
+**Alternatives evaluated:** FastAPI offers integrated validation and API documentation, making it attractive if a separate API or multiple clients become central; see its [official features](https://fastapi.tiangolo.com/features/). Flask is the approved direction for this small server-rendered app. Django is worth revisiting if accounts and administrative workflows dominate, but is not the current recommendation. A React frontend adds a build and client-state layer whose need is not established by Product.md. No agent framework, queue, microservices, or vector database is initially justified.
 
 SQLite's [official suitability guidance](https://www.sqlite.org/whentouse.html) supports local application storage but identifies its single-writer limit. Revisit a server database if concurrent users, multiple application replicas, or hosting storage constraints require it.
 
-Ollama's [structured-output documentation](https://docs.ollama.com/capabilities/structured-outputs) describes JSON-schema output and application-side validation; it currently states that Ollama Cloud does not support structured outputs. Do not assume local and cloud API capabilities are identical. The adapter must expose unsupported capabilities explicitly. No model has been selected or verified.
+Ollama's [structured-output documentation](https://docs.ollama.com/capabilities/structured-outputs) describes JSON-schema output and application-side validation; it currently states that Ollama Cloud does not support structured outputs. Do not assume local and cloud API capabilities are identical. The adapter must expose unsupported capabilities explicitly. The current local implementation uses Qwen3 4B/Ollama, with recorded evidence in Running.md and Model_Verification.json. This document performs no new model/license/runtime verification or challenge-eligibility check.
 
 ## C. System Components
 
@@ -50,8 +50,8 @@ Ollama's [structured-output documentation](https://docs.ollama.com/capabilities/
 | -------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------- |
 | Frontend                   | Input forms, draft editing, confirmation, validation feedback, source visibility, reusable UI.                                          | Authoritative scheduling, secrets, SQL, or model calls.                             |
 | Routes                     | Request parsing, identity scope when applicable, calling services, HTML/JSON responses.                                                 | Business calculations or database queries.                                          |
-| Work service               | Goals, categorized courses/projects, actionable tasks, resource references, commitments, and validated edits.                           | Specialized course tooling or resource scraping.                                    |
-| Planning service           | Draft generation coordination, explicit acceptance, revisions, and stale-draft checks.                                                  | Treating a model response as an accepted plan.                                      |
+| Work service               | Persistent goals, milestone/task relationships and validated edits; categorized courses/projects, resource references and commitments as phased.                           | Specialized course tooling or resource scraping.                                    |
+| Planning service           | Goal-plan drafts/acceptance, revisions and stale checks; separate daily plans referencing persistent tasks in Phase 2.                                                  | Treating a model response as an accepted plan.                                      |
 | Scheduling logic           | Available intervals, reserved commitments, overlap/capacity checks, unscheduled work and shortfall calculations.                        | Inventing available time or silently changing priorities.                           |
 | Progress and forecasting   | Validated actual-work records; remaining-work and completion estimates with visible assumptions.                                        | Equating time spent with progress or accepting model-generated numerical forecasts. |
 | Trajectory/context service | Current interests, priorities, preferences, approved summaries, decisions, detours, source selection, correction/deletion coordination. | Silently promoting inferred preferences or storing all chats by default.            |
@@ -149,7 +149,7 @@ Routes call service interfaces; services use repositories and pure domain functi
 Input -> route validation -> context snapshot -> AI extraction proposal
       -> schema + semantic checks -> user reviews/corrects missing details
       -> explicit confirmation -> persist approved goal/trajectory details
-      -> AI planning proposal -> deterministic schedule validation -> editable draft
+      -> AI task/milestone proposal -> semantic validation -> editable goal-plan draft
 ```
 
 Extraction and plan acceptance are separate approval boundaries. AI may propose new work details but must mark missing effort, deadlines, or priorities for clarification; it must not store guesses as facts. Existing tasks are referenced by validated identifiers. New task proposals cannot masquerade as existing records. The source snapshot includes record versions so later edits can be detected.
@@ -158,14 +158,14 @@ Extraction and plan acceptance are separate approval boundaries. AI may propose 
 
 ```text
 Edited draft + snapshot version -> route -> planning service
-    -> reload current work/availability -> validate all constraints
+    -> reload current work (and availability for Phase 2) -> validate applicable constraints
     -> if stale, explain and require review of updated draft
     -> if valid and explicitly accepted, atomic persistence -> accepted plan
 ```
 
 Validate again on acceptance, regardless of earlier browser checks. A rejected edit leaves the prior accepted plan intact. Repeated submission must not create duplicate acceptance records; use an acceptance identifier and transaction/version checks. Model invocation never holds a database write transaction open.
 
-### 3. Actual progress to updated forecast
+### 3. Actual progress to persistent work and later forecasts
 
 ```text
 Progress/time entry -> validation -> progress service -> atomic save
@@ -173,9 +173,11 @@ Progress/time entry -> validation -> progress service -> atomic save
     -> forecasting function -> estimate, basis, and missing-data explanation
 ```
 
-Record completed units separately from time spent. Forecast in comparable approved workload units using observed completion rates and future usable capacity. If units are incompatible, history insufficient, or capacity unavailable, return an explicit unavailable/uncertain result rather than a made-up date. Formula, observation window, minimum history, and uncertainty display remain OPEN DECISION. Correcting actuals recalculates estimates. Forecast failure must not erase a successfully saved progress record.
+Phase 1 saves completion/partial progress, blockers, actual time and optional accomplishment/learning notes against stable tasks and milestone context; detailed roll-up policy remains open. Phase 2 compares actuals to daily allocations and proposes next-day work using remaining capacity, missed work and changed deadlines. Reuse task identity, preserve historical plans/contributions and require approval of each new daily plan; no midnight progress reset or blind duplication. Estimates remain adjustable; actual evidence may inform revisions under reviewed rules.
 
-### 4. New learning activity to alignment review
+Record completed units separately from time spent. Forecasting below is Phase 2. Forecast in comparable approved workload units using observed completion rates and future usable capacity. If units are incompatible, history insufficient, or capacity unavailable, return an explicit unavailable/uncertain result rather than a made-up date. Formula, observation window, minimum history, and uncertainty display remain OPEN DECISION. Correcting actuals recalculates estimates. Forecast failure must not erase a successfully saved progress record.
+
+### 4. New learning activity to alignment review (Phase 3)
 
 ```text
 Activity -> context service retrieves current priorities + active detours
@@ -185,7 +187,7 @@ Activity -> context service retrieves current priorities + active detours
 
 New subject matter alone is not a distraction. Present interpretation separately from saved facts; unfamiliar or insufficient context calls for a question. No automatic priority change or punitive classification. Suggestions about an entire learning roadmap remain future scope.
 
-### 5. Confirmed detour to updated context
+### 5. Confirmed detour to updated context (Phase 3)
 
 ```text
 User confirms reason/scope and optional duration/review date
@@ -200,7 +202,7 @@ Allow later inspection, correction, or removal. A review date prompts a review; 
 | Model may propose                                                                  | Application must enforce                                                                                   |
 | ---------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------- |
 | Extracted goals, tasks, learning interests, and clarifying questions.              | Types, allowed fields, ownership, existing references, valid units/dates, and explicit confirmation.       |
-| Task ordering, workload breakdown, editable schedules, and alignment explanations. | Overlaps, reserved time, capacity, deadlines, unscheduled workload reporting, and persisted plan versions. |
+| Task ordering, workload breakdown, editable schedules, and alignment explanations. | Overlaps, reserved time, capacity, deadlines, dependencies, unscheduled workload reporting, and persisted plan versions. |
 | Summaries and reasons grounded in supplied context.                                | Confirmation state, source validity, correction/deletion behavior, and current versus historical records.  |
 | Plain-language explanation of a calculated forecast.                               | Remaining workload and numerical estimate; the model cannot override either.                               |
 
@@ -226,7 +228,7 @@ On conflicting records, use confirmed current state and ask about unresolved con
 
 Services access repository methods rather than SQL. Repositories receive a connection/unit of work; the coordinating service defines the transaction for a complete action. Keep constraints and parameterized queries in persistence and domain rules in services/domain modules. Enable referential integrity and design uniqueness/version checks where needed.
 
-Database.md will define schema, indexes, deletion relationships, migrations, and progress units. Expected record groups are work/commitments, draft and accepted plans, actual work, trajectory preferences, confirmed decisions/detours, and approved summaries. These are conceptual responsibilities, not a final table list.
+Database.md describes proposed schema, indexes, deletion relationships, migrations and progress units, distinguishing Phase 1 requirements from later-phase catalogues. Expected record groups are work/commitments, draft and accepted plans, actual work, trajectory preferences, confirmed decisions/detours, and approved summaries. These are conceptual responsibilities, not a final table list.
 
 Use short transactions, explicit commit/rollback, and no inference calls inside transactions. Database contention must produce a recoverable error, not lost updates. Keep local database files outside static assets and source control. Do not place a SQLite file on shared network storage as an assumed scaling strategy. Server-database migration requires reviewed migrations and tests; a repository boundary does not make it automatic.
 
@@ -261,28 +263,28 @@ Record request IDs, operation/failure category, duration, validation outcomes, c
 
 A remote web host's localhost refers to that host, not the developer's laptop. Local inference will not automatically become reachable or fit the hosted server. Do not expose the laptop runtime casually to solve this. Consider verified hosted open-weight inference or a local/recorded demo only if challenge rules allow; disclose which mode is actually shown. A recording or mock does not by itself satisfy real-model integration requirements.
 
-Ollama's [hardware support](https://docs.ollama.com/gpu) and [FAQ](https://docs.ollama.com/faq) inform compatibility checks; hardware details, model size/quantization, memory, operating system, context length, and measured behavior must be checked together. None has been verified for this workspace. A working runtime is not evidence of a model's license or challenge eligibility.
+Ollama's [hardware support](https://docs.ollama.com/gpu) and [FAQ](https://docs.ollama.com/faq) inform compatibility checks; hardware details, model size/quantization, memory, operating system, context length, and measured behavior must be checked together. Existing local hardware/runtime observations are recorded in Running.md and Model_Verification.json; no new measurements are made here. A working runtime is not evidence of a model's license or challenge eligibility.
 
 Flask's [deployment guidance](https://flask.palletsprojects.com/en/stable/deploying/) requires a suitable production WSGI server rather than the development server for deployment. Choose a Windows-compatible or host-appropriate server only after deployment approval. Persist SQLite on a supported durable volume; ephemeral hosting storage cannot establish restart durability.
 
 ## L. Architectural Decisions and Open Questions
 
-**Confirmed boundaries:** Product.md governs scope; deterministic code owns constraints and forecasts; important goal/commitment changes require confirmation; context is inspectable/correctable/deletable; Design.md is deferred. No implementation is authorized here.
+**Confirmed boundaries:** Product.md governs scope; deterministic code owns constraints and forecasts; important goal/commitment changes require confirmation; context is inspectable/correctable/deletable; Design.md is outside this alignment scope. No implementation is authorized here.
 
 | OPEN DECISION            | Recommendation / input needed before implementation                                                                                                                                           |
 | ------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| MVP and navigator depth  | Confirm Product.md's proposed planning loop and minimal trajectory profile. Keep broad retrieval and long-term roadmap extensions outside the initial release.                                |
-| Backend/frontend/storage | Approve or revise Flask + Jinja + browser modules + Pydantic + sqlite3/SQLite. Reassess if the planned interaction design needs a richer client.                                              |
+| Phase details            | Follow Product.md's confirmed four-phase allocation. Review milestone completion/roll-up, dependency and daily-plan policies before their dependent implementation.                                |
+| Stack details            | Approved direction is Flask/Jinja/browser modules/Pydantic/SQLite/sqlite3/pytest; version/runtime evidence belongs to requirements.txt and Running.md. Any stack change needs separate approval.                                              |
 | Challenge constraints    | Supply official rules/link, deadline, required artifacts, and definition of eligible open-weight AI use. Compliance remains unverified.                                                       |
 | Time and budget          | Supply available build time, hosting/inference budget, and team familiarity. No delivery estimate can be validated yet.                                                                       |
-| Model/runtime            | Provide CPU, RAM, GPU/VRAM, OS, and whether hosted inference is acceptable. Then compare actual model cards/licenses, runtime support, quality, latency, and memory before selecting a model. |
-| Demo and users           | Choose local single-user versus hosted demo, required access, and whether accounts are necessary. Security and database choices depend on this.                                               |
+| Model/runtime review     | Existing Qwen3 4B/Ollama smoke evidence is in Running.md and Model_Verification.json. Broader quality, future model changes and hosted routes require separate evaluation/approval. |
+| Later hosting            | Local single-user Phase 1 is confirmed; hosted access/accounts require separate scope, security and deployment decisions.                                               |
 | Scheduling and forecasts | Approve timezone, recurrence/deadline semantics, planning horizon, progress units, forecast assumptions, minimum history, and uncertainty behavior.                                           |
 | Context policy           | Define important-change boundaries, detour review behavior, retained history, deletion completion/backup policy, and hosted data handling.                                                    |
 | Inference execution      | Start with bounded synchronous requests if measured latency permits. If not, revisit a minimal job/status mechanism and stale-result handling before adding a queue dependency.               |
 
-Before selecting the model, retain the exact model/version, source model card and license, inference route, compatibility evidence, and a small planning/alignment evaluation. Add final approved choices to DECISIONS.md when that file is authorized, not during this task.
+For model selection or replacement, retain the exact model/version, source model card and license, inference route, compatibility evidence, and a small planning/alignment evaluation. Keep approval records in DECISIONS.md and measured implementation evidence in Running.md and verification artifacts.
 
-Related documents planned for later approval: `setup/Database.md`, `setup/AI_Integration.md`, `setup/Rules.md`, `setup/Testing.md`, `setup/DECISIONS.md`, and `setup/Submission.md`. Visual direction remains with the deferred `setup/Design.md`.
+Related existing documents: `setup/Database.md`, `setup/AI_Integration.md`, `setup/Rules.md`, `setup/Testing.md`, `setup/DECISIONS.md`, and `setup/submission.md`. Visual direction remains with `setup/Design.md`, which is untouched.
 
-Official technical references were consulted on 2026-10-18. Their capabilities may change; recheck versions and provider support before implementation. The workspace contained only Product.md before this document: no existing application, dependency configuration, model installation, or deployment was verified or changed.
+Official technical references were consulted on 2026-10-18. Their capabilities may change; recheck versions and provider support before implementation. The original architecture inspection preceded implementation. Running.md and implementation reports now describe the current slice; this alignment changes documentation only.

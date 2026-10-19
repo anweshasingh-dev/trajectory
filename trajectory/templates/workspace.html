@@ -28,6 +28,7 @@
       {% endif %}
     </section>
     <a class="button secondary" href="{{ url_for('goals.edit', goal_id=goal.id) }}">Edit goal</a>
+    <p><a class="button secondary" href="{{ url_for('work.index', goal_id=goal.id) }}">Manage milestones and tasks</a></p>
     {% include "_draft.html" %}
   {% else %}
     <p class="eyebrow">Begin here</p><h2 id="goal-heading">What would you like to work toward?</h2>

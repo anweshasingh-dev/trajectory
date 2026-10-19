@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% set noun = 'task' if kind == 'tasks' else 'milestone' %}
+{% block title %}{{ 'Edit' if item else 'New' }} {{ noun }} - Trajectory{% endblock %}
+{% block content %}
+<div class="form-heading"><p class="eyebrow">{{ goal.title }}</p><h1>{{ 'Edit' if item else 'New' }} {{ noun }}</h1><p class="muted">Save changes to your work. Previously approved snapshots remain available in their original form.</p></div>
+<form method="post" class="goal-form">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  <input type="hidden" name="revision" value="{{ revision }}">
+  {% if errors %}<div class="notice" role="alert"><strong>Unsaved ? review your entries.</strong><p>{{ errors.get('form', 'Correct the fields indicated below.') }}</p><a href="{{ url_for('work.index', goal_id=goal.id) }}" target="_blank" rel="noopener">Review saved work in another tab</a></div>{% endif %}
+  {% set fields = [('title', 'Title', 160, 0), ('description', 'Description', 1200, 4)] if kind == 'tasks' else [('title', 'Title', 160, 0), ('completion_criterion', 'What will this milestone achieve?', 800, 3)] %}
+  {% for name, label, limit, rows in fields %}
+  <div class="field">
+    <label for="{{ name }}">{{ label }}</label>
+    {% if rows %}<textarea id="{{ name }}" name="{{ name }}" rows="{{ rows }}" maxlength="{{ limit }}" required {% if errors.get(name) %}aria-invalid="true" aria-describedby="{{ name }}-error"{% endif %}>{{ values.get(name, '') }}</textarea>
+    {% else %}<input id="{{ name }}" name="{{ name }}" maxlength="{{ limit }}" required value="{{ values.get(name, '') }}" {% if errors.get(name) %}aria-invalid="true" aria-describedby="{{ name }}-error"{% endif %}>{% endif %}
+    {% if errors.get(name) %}<p class="field-error" id="{{ name }}-error">{{ errors[name] }}</p>{% endif %}
+  </div>
+  {% endfor %}
+  {% if kind == 'tasks' %}
+  <div class="field">
+    <label for="estimated_minutes">Estimated minutes (optional)</label>
+    <input id="estimated_minutes" name="estimated_minutes" type="number" min="1" max="10080" step="1" value="{{ values.get('estimated_minutes', '') if values.get('estimated_minutes') is not none else '' }}" {% if errors.get('estimated_minutes') %}aria-invalid="true" aria-describedby="estimate-error"{% endif %}>
+    {% if errors.get('estimated_minutes') %}<p class="field-error" id="estimate-error">{{ errors.estimated_minutes }}</p>{% endif %}
+  </div>
+  <div class="field">
+    <label for="milestone_id">Link to a milestone</label>
+    <select id="milestone_id" name="milestone_id" {% if errors.get('milestone_id') %}aria-invalid="true" aria-describedby="milestone-error"{% endif %}>
+      <option value="">Directly to this goal</option>
+      {% for milestone in milestones %}<option value="{{ milestone.id }}" {% if values.get('milestone_id') == milestone.id %}selected{% endif %}>{{ milestone.title }}</option>{% endfor %}
+    </select>
+    <p class="hint">Tasks always belong to {{ goal.title }}. Choose a milestone within this goal, or leave the task linked directly to the goal.</p>
+    {% if values.get('milestone_id') and values.get('milestone_id') not in milestones|map(attribute='id')|list %}<p class="field-error">The submitted milestone is unavailable. Choose a milestone from this goal.</p>{% endif %}
+    {% if errors.get('milestone_id') %}<p class="field-error" id="milestone-error">{{ errors.milestone_id }}</p>{% endif %}
+  </div>
+  {% endif %}
+  <div class="form-actions"><button type="submit">Save {{ noun }}</button><a href="{{ url_for('work.index', goal_id=goal.id) }}">Cancel</a></div>
+</form>
+{% endblock %}

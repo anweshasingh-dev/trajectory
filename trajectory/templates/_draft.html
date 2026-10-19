@@ -1,7 +1,16 @@
+{% if approved %}
+<section class="draft-section" aria-labelledby="approved-heading">
+  <p class="eyebrow">Approved work plan</p><h3 id="approved-heading">Your current plan</h3>
+  <p class="muted">This is the snapshot you approved. Open saved work to see current task details and manual changes.</p>
+  <p class="muted">Approved {{ approved.approved_at }} (UTC). This is an ordered work plan, not a calendar schedule.</p>
+  {% if approved.source_revision != goal.revision %}<p class="notice">The goal or saved work has changed since this plan was approved. This saved plan is preserved; review a new draft if you want to replace it.</p>{% endif %}
+  {% with proposal=approved.proposal %}{% include '_plan_content.html' %}{% endwith %}
+</section>
+{% endif %}
 <section class="draft-section" aria-labelledby="draft-heading">
   {% if generation_error %}<div class="notice" role="alert">{{ generation_error }}</div>{% endif %}
   <h3 id="draft-heading">Proposed work plan</h3>
-  <p class="muted">AI suggestions stay drafts. Review assumptions and estimates; no tasks are approved or scheduled.</p>
+  <p class="muted">Generating or saving a draft does not change your approved plan. Review all assumptions and open questions before approval.</p>
   {% if not questions %}
   <form method="post" action="{{ url_for('goals.generate', goal_id=goal.id) }}" data-generation-form>
     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
@@ -12,16 +21,28 @@
   </form>
   {% else %}<p class="muted">Answer the clarification questions above to generate a proposal.</p>{% endif %}
   {% if draft %}
-    <p class="eyebrow">Draft / {{ draft.provenance.model }}</p>
-    {% if draft.source_revision != goal.revision %}<p class="notice">Outdated draft: the goal has changed since generation. Generate a new proposal using the current context.</p>{% endif %}
-    <p class="preserve">{{ draft.proposal.summary }}</p>
-    {% if draft.proposal.assumptions %}<h4>Proposed assumptions</h4><ul>{% for note in draft.proposal.assumptions %}<li>{{ note }}</li>{% endfor %}</ul>{% endif %}
-    {% if draft.proposal.questions %}<h4>Questions to review</h4><ul>{% for note in draft.proposal.questions %}<li>{{ note }}</li>{% endfor %}</ul>{% endif %}
-    <ol class="milestones">{% for milestone in draft.proposal.milestones %}
-      <li><h4>{{ milestone.title }}</h4><p><strong>Checkpoint:</strong> {{ milestone.completion_criterion }}</p>
-      <ol>{% for task in milestone.tasks %}<li class="proposed-task"><strong>{{ task.title }}</strong><p>{{ task.description }}</p><p class="muted">Suggested effort: {% if task.estimated_minutes is none %}Unknown{% else %}{{ task.estimated_minutes }} minutes{% endif %}</p></li>{% endfor %}</ol></li>
-    {% endfor %}</ol>
-    <p class="boundary">Draft saved locally. Editing and approval will be added in the next slice.</p>
+    <p class="eyebrow">{{ draft.status|capitalize }} / revision {{ draft.revision }} / {{ draft.provenance.model }}</p>
+    {% if draft.source_revision != goal.revision %}<p class="notice">Outdated draft: the goal or saved work has changed since generation. Generate a new proposal using the current context.</p>{% endif %}
+    {% with proposal=draft.proposal %}{% include '_plan_content.html' %}{% endwith %}
+    {% if draft.status == 'draft' and draft.source_revision == goal.revision %}
+    <p><a class="button secondary" href="{{ url_for('reviews.edit', goal_id=goal.id, draft_id=draft.id) }}">Edit draft</a></p>
+    <form class="review-action" method="post" action="{{ url_for('reviews.decide', goal_id=goal.id, draft_id=draft.id, action='approve') }}">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <input type="hidden" name="revision" value="{{ draft.revision }}">
+      <input type="hidden" name="expected_plan_id" value="{{ approved.id if approved else '' }}">
+      <label class="choice"><input type="checkbox" name="confirmed" required> I reviewed this saved revision, including its assumptions and questions.</label>
+      {% if approved %}<p class="muted">Approval replaces the current plan. The previous snapshot is retained. Manual work and edits are preserved; removed proposal-managed work is archived.</p>{% endif %}
+      <button type="submit">{{ 'Approve replacement plan' if approved else 'Approve this plan' }}</button>
+    </form>
+    <details class="review-action"><summary>Reject this draft</summary>
+    <form method="post" action="{{ url_for('reviews.decide', goal_id=goal.id, draft_id=draft.id, action='reject') }}">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><input type="hidden" name="revision" value="{{ draft.revision }}">
+      <label class="choice"><input type="checkbox" name="confirmed" required> Reject this proposal and preserve any approved plan.</label>
+      <button class="secondary" type="submit">Confirm rejection</button>
+    </form></details>
+    <p class="boundary">Draft saved locally. Only explicit approval makes it your current plan.</p>
+    {% elif draft.status == 'rejected' %}<p class="notice">Draft rejected. Your approved plan is unchanged. Generate another proposal when ready.</p>
+    {% elif draft.status == 'approved' %}<p class="boundary">This draft was approved. Generating a new draft preserves your current plan.</p>{% endif %}
   {% endif %}
 </section>
 <script type="module" src="{{ url_for('static', filename='generation.js') }}"></script>

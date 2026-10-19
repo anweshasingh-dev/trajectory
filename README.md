@@ -2,11 +2,11 @@
 
 **Turn ambition into a plan you can follow—and revise.**
 
-> **Incremental Phase 1 build:** Goal capture, clarification and restart persistence are implemented. Local AI draft generation is implemented; two real-model smoke checks passed, with evidence recorded separately. Plan editing/approval and actual-work tracking remain pending. Status reviewed on October 19, 2026.
+> **Incremental Phase 1 build:** Goal capture, clarification and restart persistence are implemented. Local AI draft generation is implemented; two real-model smoke checks passed, with evidence recorded separately. Draft editing, rejection and exact-revision approval are implemented. Actual-work tracking remains pending. Status reviewed on October 19, 2026.
 
 ## Overview
 
-Trajectory is a planned AI-assisted workspace for students, independent learners and freelancers managing learning goals, projects and competing commitments. It starts with a Goal-to-Plan Assistant and aims to grow into a personal planning and career navigator grounded in actual progress.
+Trajectory is a personal goal-to-action and progress system for students, independent learners and freelancers managing learning goals, projects and competing commitments. It connects long-term direction to realistic daily work while preserving multiple interests and intentional exploration. It starts with a Goal-to-Plan Assistant and aims to grow into a personal planning and career navigator grounded in actual progress.
 
 ## Problem and solution
 
@@ -16,18 +16,22 @@ Trajectory aims to turn that description into proposed tasks and milestones, ask
 
 ## Key features
 
-**Implemented:** Create/edit/reopen goals, explicit clarification answers, validated local AI draft-generation workflow, saved drafts and stale-context protection. **Pending:** Draft editing/approval, actual-work tracking and complete Phase 1 verification. The table below describes the full phase boundaries.
+**Implemented:** Create/edit/reopen goals, explicit clarification answers, validated local AI draft-generation workflow, saved drafts, editing/reordering, explicit rejection/approval and stale-context protection. **Pending:** Actual-work tracking and complete Phase 1 verification. The table below describes the full phase boundaries.
 
 | Scope | Planned capabilities |
 | --- | --- |
 | Phase 1 MVP | Natural-language goal capture; open-weight task/milestone proposals and clarification; explicit review/edit/approval; task completion and actual-work records; persistence across restarts. |
-| Later core capabilities | Daily schedules, recurring commitments, overload detection, planned-versus-actual comparison, deterministic forecasts and editable replanning. |
-| Personal Career Navigator | Multiple career interests, editable persistent preferences/decisions, relevant learning resources, alignment advice and intentional detours. |
-| Future possibilities | Historical-note retrieval/RAG, longer-term learning-roadmap suggestions, richer exploration reviews and a creative-practice journal with sketches. Each needs separate scope approval. |
+| Phase 2 Planning | Natural-language daily intentions; prioritized editable schedules linked to persistent goals, milestones and tasks; recurring commitments, overload, planned-versus-actual, evidence-based forecasts and next-day replanning. |
+| Phase 3 Personal Career Navigator | Multiple career interests, editable persistent preferences/decisions, relevant learning resources, alignment advice and intentional detours. |
+| Phase 4 future possibilities | Historical-note retrieval/RAG, richer learning roadmaps, exploration reviews and the dedicated Sketch Journal/artistic development module. Each needs separate scope approval. |
+
+Goals, milestone checklists and unfinished master tasks persist; each later daily plan records its own intended work without resetting progress or blindly duplicating tasks. Recorded completion, partial work, blockers, time and optional learning notes inform progress and subsequent proposals. These are planned behaviors; actual-work tracking remains pending.
+
+The future Sketch Journal preserves dated sketches, practice/time/notes, exercise/skill/goal links and comparisons across time, with eventual vision-assisted feedback and practice suggestions that communicate uncertainty. Its architecture, storage, privacy and model choices remain open; see [the full artistic vision](setup/Product.md#6-future-scope).
 
 ## AI approach
 
-The application sends selected goal context to a local Ollama adapter and validates structured task/milestone proposals before saving them as drafts. No generated task is approved automatically. Editing and approval are pending.
+The application sends selected goal context to a local Ollama adapter and validates structured task/milestone proposals before saving them as drafts. No generated task is approved automatically. Users can edit and explicitly approve a saved revision; draft changes never silently replace an approved plan.
 
 The selected default is Qwen3 4B through local Ollama. Its published artifact uses Apache 2.0; no model weights are bundled. Actual inference evidence is recorded in [Model_Verification.json](setup/Model_Verification.json), separately from automated fake-adapter tests. No agent framework, vector database or full-chat archive is used. See [run and model setup instructions](setup/Running.md).
 
@@ -49,9 +53,9 @@ Possible monetization includes a one-time local-app purchase or paid convenience
 
 ## Current development status
 
-The first working slices support goal capture, correction, explicit unknown/no-deadline clarification, local structured proposal generation and SQLite restart persistence. Invalid responses are rejected, changed goal context invalidates generation, and failed attempts preserve earlier saved drafts. Plan review/edit/approval and actual-work records are still pending.
+The first working slices support goal capture, correction, explicit unknown/no-deadline clarification, local structured proposal generation and SQLite restart persistence. Invalid responses are rejected, changed goal context invalidates generation, and failed attempts preserve earlier saved drafts. Plan review/edit/approval is implemented with immutable approved snapshots and retained task identities. Actual-work records remain pending.
 
-Automated tests cover goal persistence and validation, clarification, draft lifecycle and inference failure paths. These use fake adapters for repeatability; a live model smoke check is separate and does not establish broad plan quality. Older setup documents preserve earlier proposals and task statuses; [Running.md](setup/Running.md) describes the implemented slice.
+Automated tests cover goal persistence and validation, clarification, draft lifecycle and inference failure paths. These use fake adapters for repeatability; a live model smoke check is separate and does not establish broad plan quality. Setup documents distinguish phased requirements from technical proposals; Tasks.md retains its earlier tracking snapshot without certifying completion; [Running.md](setup/Running.md) describes the implemented slice.
 
 ## Technology stack
 

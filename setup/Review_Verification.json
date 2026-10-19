@@ -1,0 +1,92 @@
+{
+  "checked_at_utc": "2026-10-19T14:23:43.804541+00:00",
+  "automated_tests": "50 passed",
+  "browser_check": "Headless Chrome passed add/remove/reorder, nested field names, limits and data retention.",
+  "generation_seconds": 20.23,
+  "input": {
+    "title": "Synthetic: publish a small Python CLI",
+    "description": "Build a small command-line text word counter.",
+    "desired_outcome": "A runnable script with tests and a README.",
+    "starting_point": "Basic Python functions and file handling.",
+    "weekly_hours": "3",
+    "no_deadline": "on"
+  },
+  "provenance": {
+    "model": "qwen3:4b",
+    "digest": "359d7dd4bcdab3d86b87d73ac27966f4dbb9f5efdfcc75d34a8764a09474fae7",
+    "prompt_version": "goal-plan-v2",
+    "total_duration_ns": 19883647100,
+    "eval_count": 497
+  },
+  "approved_draft_revision": 2,
+  "exact_edited_content_persisted": true,
+  "duplicate_approval_status": 303,
+  "restart_reopen_status": 200,
+  "approved_proposal": {
+    "summary": "Reviewed plan: Work plan for publishing a small Python CLI word counter",
+    "assumptions": [
+      "User has basic Python functions and file handling knowledge",
+      "User can run Python scripts and understand command-line interfaces",
+      "User has access to a terminal for testing"
+    ],
+    "questions": [
+      "Do you have a specific file format in mind for the word counter (e.g., text files only)?",
+      "Should the word counter handle case sensitivity (e.g., 'Hello' vs 'hello')?"
+    ],
+    "milestones": [
+      {
+        "title": "Define core functionality",
+        "completion_criterion": "A Python script that reads a file and counts words with basic error handling",
+        "tasks": [
+          {
+            "title": "Reviewed: Create a script that takes a filename as command-line argument",
+            "description": "Use sys.argv to accept input file path",
+            "estimated_minutes": null
+          },
+          {
+            "title": "Implement word counting logic",
+            "description": "Split text into words and count occurrences",
+            "estimated_minutes": null
+          },
+          {
+            "title": "Add basic error handling for missing files",
+            "description": "Check if file exists before reading",
+            "estimated_minutes": null
+          }
+        ]
+      },
+      {
+        "title": "Add testing",
+        "completion_criterion": "At least one test case passes in a test file",
+        "tasks": [
+          {
+            "title": "Create a test script using unittest",
+            "description": "Write a test for counting words in a sample file",
+            "estimated_minutes": null
+          },
+          {
+            "title": "Run tests with pytest",
+            "description": "Verify test passes with minimal test coverage",
+            "estimated_minutes": null
+          }
+        ]
+      },
+      {
+        "title": "Document and publish",
+        "completion_criterion": "README with usage instructions and installation steps",
+        "tasks": [
+          {
+            "title": "Write README with example usage",
+            "description": "Include command to run and sample output",
+            "estimated_minutes": null
+          },
+          {
+            "title": "Add license file",
+            "description": "Include a simple license (e.g., MIT) for publication",
+            "estimated_minutes": null
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -1,7 +1,7 @@
 ﻿# Trajectory — AI Integration
 
-> **Status: Proposal for review. No model, license, runtime configuration, hardware fit, or challenge eligibility is verified.**
-> Sources of truth: `setup/Product.md` and the approved `setup/Architecture.md`. Their unresolved choices remain open. This document specifies integration behavior; it authorizes no implementation. `setup/Design.md` remains deferred.
+> **Status: Integration requirements/proposals by phase.** Running.md and Model_Verification.json record the current Qwen3 4B/Ollama implementation and smoke evidence; this alignment performs no new model/license/runtime verification and claims no challenge eligibility.
+> Sources of truth: `setup/Product.md` and the approved `setup/Architecture.md`. Their unresolved choices remain open. This document specifies integration behavior; it authorizes no implementation. `setup/Design.md` remains outside this alignment scope.
 
 ## 1. The integration at a glance
 
@@ -35,7 +35,7 @@ Any failed final check returns a review/error result rather than saving. Generat
 
 ## 2. MVP scope and deterministic boundaries
 
-“MVP” below means support for Product.md's proposed initial scope if approved; it does not promote future ideas into release requirements.
+Phase 1 means bounded goal clarification and task/milestone proposals for an ordered non-calendar goal plan, with review/edit/exact approval and persisted actual work. Phase 2 adds daily planning and forecasts; Phase 3 adds trajectory/alignment/context workflows. Phase 4 extensions remain separately scoped. The cross-phase responsibilities below do not make navigator or scheduling contracts Phase 1 dependencies.
 
 | AI proposes | Application owns | User controls |
 | --- | --- | --- |
@@ -44,26 +44,26 @@ Any failed final check returns a review/error result rather than saving. Generat
 | Possible priority mismatches and exploration questions. | Current confirmed priorities, active detours, source status/version checks. | Decide whether an activity is an intentional detour. |
 | Preference/decision summaries grounded in supplied context. | Confirmation, persistence, correction/deletion and invalidation. | Inspect and amend stored context; confirm important changes. |
 
-**Proposed scheduling refinement:** Ask AI for ordering and allocation suggestions, then let deterministic scheduling code place work in valid intervals. User-edited times are checked by the same code. The architecture permits editable schedule suggestions; this narrower contract avoids relying on model arithmetic. The placement/prioritization policy remains OPEN DECISION and must be approved before implementation. The model must never override a scheduling constraint.
+**Phase 2 proposed scheduling refinement:** Ask AI for ordering and allocation suggestions, then let deterministic scheduling code place work in valid intervals. User-edited times are checked by the same code. The architecture permits editable schedule suggestions; this narrower contract avoids relying on model arithmetic. The placement/prioritization policy remains OPEN DECISION and must be approved before implementation. The model must never override a scheduling constraint.
 
-Forecasting remains entirely application-owned: recorded completed work, remaining workload and approved future-capacity assumptions feed a testable calculation. Time spent is distinct from completed quantity. Incompatible units or insufficient evidence produce an unavailable/uncertain estimate. No model-generated completion date is accepted as a forecast. The MVP can show template-based forecast explanations without a model call; optional model paraphrasing may not change computed values.
+Forecasting remains entirely application-owned: recorded completed work, remaining workload and approved future-capacity assumptions feed a testable calculation. Time spent is distinct from completed quantity. Incompatible units or insufficient evidence produce an unavailable/uncertain estimate. No model-generated completion date is accepted as a forecast. Phase 2 can show template-based forecast explanations without a model call; optional model paraphrasing may not change computed values.
 
-**Future only:** Broad historical-note/conversation RAG, embedding/vector search, longer-term roadmap suggestions, richer exploration reviews, autonomous multi-step tools, and the creative-practice journal. No agent framework is justified for the bounded workflows below.
+**Future only:** Broad historical-note/conversation RAG, embedding/vector search, longer-term roadmap suggestions, richer exploration reviews, autonomous multi-step tools, and the Phase 4 Sketch Journal/artistic development module (Product.md Section 6). A suitable vision model may later support uncertain visual observations and practice suggestions; media privacy, model selection and evaluation are open, with no Phase 1 integration required. No agent framework is justified for the bounded workflows below.
 
 ## 3. Model and runtime selection
 
-### 3.1 Evidence before selection
+### 3.1 Evidence before selection or replacement
 
-Do not choose a model because its name appears in a runtime catalogue. For each candidate, retain this evidence in the later approved decision/submission records, not in invented verification claims.
+The table preserves selection gates, not a claim that current implementation evidence is absent: Running.md and Model_Verification.json record the selected local artifact, configuration and limited observed behavior. Challenge eligibility and broad quality are not established by smoke checks. For a new selection or replacement, do not choose a model because its name appears in a runtime catalogue. For each candidate, retain this evidence in the later approved decision/submission records, not in invented verification claims.
 
 | Selection gate | Evidence needed | Current state |
 | --- | --- | --- |
-| Open weights and identity | Official publisher/model card, exact repository/revision or artifact digest, weight availability and provenance of any quantization. | Not selected or verified. |
-| License and challenge fit | Exact model-specific license and conditions; compare attribution, use, redistribution and hosting restrictions with official challenge rules. Runtime license is separate. | Model license and challenge rules unverified. |
-| Runtime compatibility | Supported architecture/format, exact runtime version, adapter capabilities and successful load on the target device/service. | Not tested. |
-| Hardware fit | CPU, OS, RAM, GPU/VRAM, driver support, model/quantization size, context size, and measured cold/warm memory behavior. | Device specifications not supplied. |
-| Task quality | Extraction, structured responses, clarification, grounded alignment, and intentional-detour evaluation results. | Evaluation not run. |
-| Practical demo | Measured response time, failure recovery, storage/network availability and permitted demo format. | Hosting and budget open. |
+| Open weights and identity | Official publisher/model card, exact repository/revision or artifact digest, weight availability and provenance of any quantization. | Existing local identity evidence: Running.md / Model_Verification.json; reverify for replacements. |
+| License and challenge fit | Exact model-specific license and conditions; compare attribution, use, redistribution and hosting restrictions with official challenge rules. Runtime license is separate. | Existing license references: Running.md; challenge eligibility remains unverified. |
+| Runtime compatibility | Supported architecture/format, exact runtime version, adapter capabilities and successful load on the target device/service. | Local smoke evidence recorded; no new runtime tests here. |
+| Hardware fit | CPU, OS, RAM, GPU/VRAM, driver support, model/quantization size, context size, and measured cold/warm memory behavior. | Hardware observations: Tasks.md / existing verification; no new measurements here. |
+| Task quality | Extraction, structured responses, clarification, grounded alignment, and intentional-detour evaluation results. | Limited goal-proposal smoke evidence exists; broader phase-specific evaluation remains pending. |
+| Practical demo | Measured response time, failure recovery, storage/network availability and permitted demo format. | Local single-user app is approved; hosted routing, budget and demo eligibility remain separate decisions. |
 | Data handling | Where prompts go; provider retention/access terms if hosted; user disclosure and approved personal-data handling. | Not approved. |
 
 **Proposed process:** Establish hardware/time/budget constraints, then shortlist a small number of compatible instruction-tuned open-weight candidates. Compare exact artifacts on the same synthetic task set. Choose the smallest candidate that meets approved quality and response-time criteria; model size alone is not evidence of quality. Do not download or install anything during documentation.
@@ -82,7 +82,15 @@ Ollama documents schema-constrained responses in [structured outputs](https://do
 
 ## 4. Input and output contracts
 
-These are proposed logical contracts, not executable schemas or finalized route/database fields. Contract versions must be pinned with prompt/model settings during evaluation. Pydantic is the architecture's proposed validation tool, not an authorization to install it.
+These are proposed logical contracts, not executable schemas or finalized route/database fields. Contract versions must be pinned with prompt/model settings during evaluation. Pydantic is the approved validation direction; this document authorizes no installation or code change.
+
+### Phase-specific contract boundary
+
+**Phase 1:** A bounded proposal must distinguish goal facts from assumptions/questions and include reviewable milestone checkpoints/completion criteria and ordered actionable tasks, with effort suggestions adjustable or unknown. Draft-local keys are not persistent task IDs. Exact approval creates or links persistent work under reviewed identity/version rules. Current executable proposal bounds and approved-plan storage are documented in Running.md; the tables below retain logical proposals across later phases, not replacement schemas.
+
+**Phase 2 daily intentions:** Interpret tomorrow's natural-language intentions against existing goals, milestones, task IDs, unfinished work, deadlines, dependencies, available hours and relevant actual contributions/blockers. Propose priority/order, estimated time, a useful minimum work session and concise contribution reasons tied to goals/milestones. Flag unknowns and infeasible work for review. Estimates are suggestions, adjustable using recorded evidence under an approved policy; do not claim unsupported learned accuracy.
+
+Each daily plan is an editable proposal with explicit approval, separate from the persistent task list and actual-work history. Next-day proposals reference the same unfinished tasks, accounting for missed work, changed deadlines and remaining capacity; never reset progress or blindly clone tasks. Application logic validates dependency order, deadlines and available time and computes overload. Minimum-session definition, estimate adjustment and exact future contract fields remain OPEN DECISION.
 
 ### 4.1 Backend request envelope
 
@@ -93,7 +101,7 @@ These are proposed logical contracts, not executable schemas or finalized route/
 | `user_input` | Bounded text supplied for this action, treated as data within application policy. |
 | `context` | Selected confirmed records with typed IDs, versions, status and content needed for this operation. |
 | `source_revision` | Application-owned snapshot revision/version token; rechecked before showing or applying results. Not a value trusted from the model. |
-| `planning_inputs` | Only for planning: confirmed candidate task IDs, requested/remaining effort, deadlines, current priorities, and application-derived capacity information. |
+| `planning_inputs` | Only for planning: confirmed candidate task IDs and linked goals/milestones, requested/remaining effort, deadlines, dependencies, current priorities, unfinished work, relevant contributions/blockers and application-derived capacity information (Phase 2). |
 | `response_schema` | Backend-selected schema for this operation. No generic executable action language. |
 | Runtime limits | Server-controlled timeout, input/context budget, output byte/token limits and generation settings; exact values remain OPEN DECISION. |
 
@@ -116,7 +124,7 @@ Reject unknown fields, invalid types, unbounded arrays/text, contradictory statu
 | Operation | Item fields | Meaning and checks |
 | --- | --- | --- |
 | Extraction | `proposal_key`, `kind`, `title`, optional `details`, `deadline_text`, `priority`, `effort_minutes`, `progress_unit`, `remaining_quantity`, `source_refs` | Allowlisted work/task/interest/preference proposals; missing values stay absent/NULL. Keys identify draft items, not database rows. Ambiguous dates or effort require clarification; do not invent defaults as confirmed facts. |
-| Planning | `task_id`, `rank`, `suggested_minutes`, `reason`, `source_refs` | Existing confirmed tasks only; positive integer minutes, unique task IDs/ranks, no forecast dates or authoritative timestamps. Suggestions cannot exceed validated remaining effort without review. |
+| Daily planning (Phase 2) | `task_id`, `rank`, `suggested_minutes`, `reason`, `source_refs` | Existing confirmed tasks only; positive integer minutes, unique task IDs/ranks, no forecast dates or authoritative timestamps. Suggestions cannot exceed validated remaining effort without review. |
 | Alignment | `activity_key`, `assessment`, `possible_mismatch`, `question`, `source_refs` | Assessment: consistent / possible_mismatch / insufficient_context. No persistent distraction label. A mismatch asks whether exploration is intentional; insufficient evidence prompts clarification. |
 | Context summary/change | `proposal_key`, `kind`, optional `target_ref`, `proposed_text`, `reason`, optional `detour_scope`, `review_date_text`, `source_refs` | Propose inspectable preference/decision/detour/summary text; target must exist when modifying a record. Dates and exact changes need user review; important goal/commitment changes always require confirmation. |
 
@@ -163,7 +171,7 @@ flowchart LR
     H[Historical notes: future] -. approved retrieval extension .-> S
 ```
 
-**MVP retrieval:** Use repository queries by linked goals/tasks, current priorities, active detours and bounded relevant decisions. Include approved summaries only when current and traceable to their sources. Do not require embeddings, a vector database or full chat storage. Resource links are references, not authorization to fetch remote content.
+**Phase 3 context retrieval:** Use repository queries by linked goals/tasks, current priorities, active detours and bounded relevant decisions. Include approved summaries only when current and traceable to their sources. Do not require embeddings, a vector database or full chat storage. Resource links are references, not authorization to fetch remote content.
 
 Apply access scope and pending-deletion exclusions before selecting records. Preserve crucial constraints and active detour scope when limiting context. If relevant evidence cannot fit the model's verified context budget, retrieve a narrower set or ask a question; never silently truncate mandatory constraints and then claim the result is grounded.
 
@@ -181,7 +189,7 @@ Structured records define current facts; approved summaries are derived context;
 | 2. Structure | Parse JSON and validate the operation's schema/types/enums/limits. | Reject malformed/extra/unsupported fields; no partial application. |
 | 3. References | Check supplied task/source/target IDs, ownership, status and versions. | Reject unknown/stale/deleted references; regenerate or clarify. |
 | 4. Meaning | Check dates, quantities, existing versus new tasks, facts versus interpretations, and detour/change semantics. | Ask about missing/contradictory information; unsupported claims stay unverified. |
-| 5. Domain | Compute placements/overlaps/capacity and forecast values in deterministic modules. | Show violations and unscheduled work; never present a violating schedule as valid. |
+| 5. Domain | In Phase 2, enforce deadlines/dependencies and compute placements/overlaps/capacity and forecast values in deterministic modules. | Show violations and unscheduled work; never present a violating schedule as valid. |
 | 6. User review | Present exact editable proposal with relevant sources and before/after values for important changes. | Declined/unconfirmed changes do not become facts. |
 | 7. Commit | Re-read current versions, revalidate edits/constraints, atomically persist and prevent duplicate acceptance. | Rollback or review prompt; preserve the prior accepted plan. |
 
@@ -210,7 +218,7 @@ Log request IDs, operation, prompt/contract versions, exact runtime/model identi
 
 ## 9. Evaluation plan — prove usefulness and containment
 
-No evaluation, benchmark, real-model call, hardware check or license verification has been performed for this document. The plan below defines future evidence, not achieved results. Detailed test ownership belongs in `setup/Testing.md` when authorized.
+No new evaluation, benchmark, real-model call, hardware check or license verification is performed by this documentation alignment. Existing local smoke observations are recorded in Running.md and Model_Verification.json. The plan below defines future evidence, not achieved results. Detailed test ownership belongs in `setup/Testing.md` when authorized.
 
 ### 9.1 Two complementary test tracks
 
@@ -253,13 +261,13 @@ Keep exact model revision/digest, license source, runtime/device configuration, 
 | OPEN DECISION | Input needed |
 | --- | --- |
 | Challenge eligibility | Official challenge rules/link, deadline and submission evidence requirements. |
-| Candidate selection | Device CPU/RAM/GPU/VRAM/OS, time/budget limits, and whether hosted inference is acceptable. No candidate/license is approved here. |
-| Runtime/deployment | Local live demo versus hosted service; endpoint capabilities, model reachability, storage and security boundaries. |
-| Planning contract | Approve AI ordering/allocation followed by deterministic placement; choose scheduling policy without changing Product.md's constraints. |
+| Candidate replacement / broader evaluation | Existing Qwen3 4B/Ollama evidence is referenced above, without making a new selection. Approve phase-relevant quality budgets and any new model/hosted route separately. |
+| Later runtime/deployment | Local single-user Phase 1 is confirmed; hosted processing, new endpoints and public access need separate decisions. |
+| Planning contracts | Review milestone/progress and non-calendar plan semantics against current Phase 1 contracts; separately settle Phase 2 minimum-session/estimate outputs, dependencies and placement policy. |
 | Budgets and quality gates | Context/output limits, timeout, response-time target and minimum useful extraction/alignment quality. |
 | Context and confirmation | Important-change boundaries, detour review behavior, proposal expiry, correction/deletion and retention requirements. |
 | Forecast inputs | Units, minimum history, future-capacity assumptions and formula remain application decisions; the model cannot settle them. |
 
-Related documents: Product.md defines behavior; Architecture.md defines component boundaries. Database.md is a separate schema proposal, not assumed approved by this integration document. Testing.md and Submission.md will hold detailed verification/submission requirements when authorized. This document does not create them.
+Related documents: Product.md defines behavior; Architecture.md defines component boundaries. Database.md is a separate schema proposal, not assumed approved by this integration document. Testing.md and submission.md hold verification/submission requirements. Running.md describes current implementation; this document does not modify those records.
 
 Official runtime references were checked on 2026-10-18. These establish documented capabilities only; recheck the exact selected versions and provider route before implementation. No application files, dependencies, model artifacts or other setup documents are authorized by this proposal.

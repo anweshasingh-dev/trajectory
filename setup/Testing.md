@@ -7,7 +7,7 @@
 
 The approved roadmap makes Phase 1 a **Goal-to-Plan Assistant**: capture a goal, obtain real open-weight task/milestone suggestions, review/edit/approve, track actual work, and reopen saved records after restart. Phase 2 adds time-slot scheduling and forecasts; Phase 3 adds the persistent career navigator; Phase 4 tests only individually approved extensions.
 
-Product.md and the proposed database/AI contracts still describe a broader initial slice. Tasks.md already identifies required source-document alignment, including milestones and non-calendar plans. Until separately approved, do not invent schema fields or final contracts to make a test pass. Specify the expected behavior here; mark dependent executable checks as Blocked when their missing contract actually prevents execution.
+Product.md and the database/AI requirements now distinguish non-calendar goal plans from Phase 2 daily schedules. Exact milestone/progress, dependency and daily-plan policies still need review against current storage/contracts; this alignment does not settle them. Do not invent schema fields or final contracts to make a test pass. Specify the expected behavior here; mark dependent executable checks as Blocked when their missing contract actually prevents execution.
 
 ```mermaid
 flowchart LR
@@ -31,7 +31,7 @@ This describes a verification path, not a requirement to run every test for ever
 | Browser workflow | The user can enter, edit, approve, correct and reopen work with understandable feedback. | Manual checklist initially; automate only when the interaction design and repeated need justify it. |
 | Real-model evaluation | Observed usefulness, extraction/clarification, grounding, variability, latency and meaningful live integration. | Exact candidate/settings and synthetic cases; separate from deterministic tests. |
 
-pytest remains a **proposed** runner from Architecture.md; no installation/version selection is made here. Keep tests under the architecture's proposed unit/integration/workflow groups when implementation is authorized. Do not enforce arbitrary test-file counts, blanket coverage percentages or full-string snapshots of model prose.
+pytest is the approved runner direction; requirements.txt records existing pinned dependencies. No installation/version change is made here. Keep tests under the architecture's proposed unit/integration/workflow groups when implementation is authorized. Do not enforce arbitrary test-file counts, blanket coverage percentages or full-string snapshots of model prose.
 
 ## 3. Safe fixtures and repeatability
 
@@ -44,7 +44,7 @@ pytest remains a **proposed** runner from Architecture.md; no installation/versi
 
 ## 4. Phase 1 — Core MVP acceptance checks
 
-All checks below start **Not Run**. These are planned tests, not claims of implemented features. The roadmap task column connects each check to its required behavior.
+All checks below retain their planned **Not Run** status in this document. Running.md and implementation reports contain separate later verification records; this alignment neither reruns them nor certifies every acceptance criterion. The roadmap task column connects each check to its required behavior.
 
 | Test ID | Scenario | Observable pass condition | Roadmap task |
 | --- | --- | --- | --- |
@@ -64,6 +64,8 @@ All checks below start **Not Run**. These are planned tests, not claims of imple
 
 **Phase 1 boundary:** Daily calendar placement, full overload/forecast algorithms, trajectory memory and advanced RAG are not Phase 1 exit requirements. Their tests remain visible below. Validation, approval, safe personal-data handling and persistence are required as soon as corresponding records exist.
 
+Additional Phase 1 acceptance coverage for P1.05/P1.07: reopen linked goals, milestone checklists, persistent tasks and accepted ordered plans without inventing a calendar date; record/correct completion, partial work, blockers, actual time and optional accomplishment/learning notes. Under the approved progress policy, contributions update relevant task/milestone state without equating elapsed time and completion or losing prior contributions on replacement. These are behavioral checks, not new schema decisions.
+
 ## 5. Phase 2 — Planning and forecasting checks
 
 Status: **Not Run; later-phase scope.** Executable cases depend on approved time, recurrence, deadline, progress-unit and forecast policies. Do not silently choose those policies as test expectations.
@@ -73,13 +75,21 @@ Status: **Not Run; later-phase scope.** Executable cases depend on approved time
 | T2.01 | Organize goals, courses/projects, standalone and related tasks/resources. | Valid relationships/ownership; edits preserve existing Phase 1 records and progress. | P2.01 |
 | T2.02 | Availability 09:00–11:00 and 10:00–12:00; commitment 10:30–11:00, on a fixed ordinary local day. | Union availability = 180 minutes; usable capacity = 150, not a sum that double-counts overlap. Commitments outside availability do not make capacity negative. | P2.02 |
 | T2.03 | Weekly/one-off rules, midnight boundaries, DST ambiguity and invalid date/zone. | Approved recurrence policy is followed; unsupported/ambiguous input is clarified or rejected. No silent host-timezone conversion. | P2.02 |
-| T2.04 | Generated or edited blocks overlap, exceed capacity, conflict with commitments or violate effective deadlines. | Deterministic code rejects invalid acceptance; prior accepted plan survives. Boundary cases use the approved interval semantics. | P2.03 |
+| T2.04 | Generated or edited blocks overlap, exceed capacity, conflict with commitments, violate effective deadlines or task dependencies. | Deterministic code rejects invalid acceptance; prior accepted plan survives. Boundary cases use the approved interval semantics. | P2.03 |
 | T2.05 | Request 180 minutes against 150 usable minutes. | All requested tasks remain represented; report at least 30 unallocated minutes, or more if other constraints prevent fitting. Distinguish work not requested today from requested work that could not fit. | P2.04 |
 | T2.06 | Model omits a submitted task, invents an ID or exceeds allowed effort. | Do not silently drop work or trust arithmetic; flag/reject the proposal and calculate allocations/shortfall in code. | P2.03/P2.04 |
 | T2.07 | Compare an accepted plan with actual work, then replace it. | Show planned versus actual without rewriting original history; replacement requires acceptance; duplicate requests create at most one current accepted plan for the approved day/key. | P2.04/P2.06 |
 | T2.08 | Forecast with a reviewed fixed progress/capacity dataset. | Result matches a hand-calculated oracle for the approved formula and rounding; expose inputs/assumptions. Changing model prose cannot change the number/date. | P2.05 |
 | T2.09 | No history, zero future capacity, incompatible units or missing remaining work. | An explicit missing-data/unavailable or policy-defined uncertainty result, never an invented date or division error. | P2.05 |
 | T2.10 | Correct actuals/remaining workload or reduce future availability. | Recompute from corrected evidence; proposed replanning is editable and independently revalidated. No silent commitment changes. | P2.05/P2.06 |
+
+Additional Phase 2 checks (P2.03/P2.06), all **Not Run**:
+
+| Scenario | Observable pass condition |
+| --- | --- |
+| Describe tomorrow's intentions with linked goals/milestones, unfinished tasks and limited hours. | Proposal includes priorities, adjustable estimates, a useful minimum session and contribution reasons; user edits/approves; application rejects deadline/dependency/capacity violations. Unknowns prompt clarification. |
+| Record partial progress/blockers today, miss another task, change a deadline, then request tomorrow's plan. | New daily plan references existing unfinished task identities; completed progress persists, no duplicate master tasks appear, and revised work fits current capacity or reports a shortfall. Historical plans and actual contributions remain reviewable. |
+| Correct actual work or an estimate. | Estimates remain editable; any evidence-based adjustment exposes its basis under an approved policy. No unsupported accuracy claim or automatic task/milestone completion from time alone. |
 
 Do not define a numerical forecast oracle until the formula, minimum evidence and units are approved. Retain cases for both sufficient and insufficient evidence; do not make tests pass by substituting language-model predictions.
 
@@ -107,7 +117,7 @@ Run only for an explicitly selected extension under P4.01–P4.02; all are **Not
 | Historical notes/conversation retrieval · P4.O1 | Review retrieval relevance/source recall, access isolation, stale/conflicting evidence, correction/deletion propagation and supporting excerpts. A matching citation does not establish semantic correctness or eliminate hallucinations. |
 | Longer-term roadmaps · P4.O2 | Suggestions have valid supporting goals/prerequisites/evidence; edits/approval remain available; no model-generated completion promises replace forecasts. |
 | Richer exploration reviews · P4.O3 | Multiple experiments retain reasons/outcomes and user control without punitive labels or automatic career changes. |
-| Creative-practice journal · P4.O4 | Approved media types/limits, safe storage/rendering, save/reopen, correction/deletion and access boundary; no unsupported claim of improved artistic skill. |
+| Sketch Journal / artistic development · P4.O4 | For the selected slice, verify dated sketch organization; practice sessions/time/notes; exercise/skill/goal links; selected comparisons across time; save/reopen and correction/deletion. If vision feedback is selected, assess useful gesture/proportions/perspective/values observations and practice suggestions, uncertainty and separation of observations from subjective judgments. No unsupported objective ability or improvement claims. Storage/privacy/model/evaluation decisions must precede dependent tests; no Phase 1 fixtures required. |
 | Exploratory backlog · B01–B04 | Add only the approved feature's cases: calendar/integration failure; recurring-task duplicates; historical estimates; or multi-user isolation/security as applicable. Do not build these fixtures/infrastructure now. |
 
 ## 8. Cross-cutting integrity and security
@@ -177,8 +187,8 @@ Passing a limited test set is not proof of universal reliability, privacy, offli
 
 | OPEN DECISION | Required before dependent execution |
 | --- | --- |
-| Phase 1 contracts/schema | Settle milestones and persistent non-calendar plans through separately authorized source-document alignment. |
-| Tools and interactions | Approve runner/dependencies and minimum interaction design; browser automation is optional until justified. Design.md stays deferred pending authorization. |
+| Phase 1 contracts/schema | Requirements now distinguish persistent non-calendar goal plans; review exact milestone identity/checklist, contribution updates and task membership against current contracts/storage before dependent tests. |
+| Tools and interactions | pytest/stack direction is approved; review existing Design.md and authorize any needed interaction/test-tool refinements separately. Browser automation is optional until justified. |
 | Deterministic oracles | Approve timezone/recurrence/deadline semantics, scheduling policy, units, forecast formula, minimum evidence and rounding. |
 | Model/runtime and quality budgets | Verify exact candidate/license/runtime/hardware and approve timeout/context/output limits and practical quality/latency targets. |
 | Context and retention | Approve important-change boundaries, deletion/backup/provider policy and source invalidation details. |

@@ -1,0 +1,10 @@
+<ol class="milestones">
+{% for task in members %}
+<li class="proposed-task">
+  <strong>{{ task.title }}</strong>
+  <p class="preserve">{{ task.description }}</p>
+  <p class="muted">Estimated effort: {% if task.estimated_minutes is none %}Unknown{% else %}{{ task.estimated_minutes }} minutes{% endif %}</p>
+  <a href="{{ url_for('work.edit', goal_id=goal.id, kind='tasks', item_id=task.id) }}">Edit task <span class="muted">? {{ task.title }}</span></a>
+</li>
+{% else %}<li class="muted">No tasks here yet.</li>{% endfor %}
+</ol>

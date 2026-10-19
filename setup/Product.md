@@ -4,7 +4,7 @@ Status: Draft for review. Creation approval does not approve every proposal belo
 
 ## 1. Purpose and audience
 
-Trajectory is an AI-assisted personal planning and goal-forecasting application for students, independent learners, and freelancers managing competing priorities.
+Trajectory is a personal goal-to-action and progress system for students, independent learners, and freelancers managing competing priorities.
 
 It aims to help people build realistic plans, record what actually happened, and adjust expectations using recorded progress. It also supports learners exploring multiple related or emerging career interests, such as machine learning, software development, and quantum computing, without requiring a single fixed career path. These are intended outcomes, not validated results.
 
@@ -17,11 +17,11 @@ It aims to help people build realistic plans, record what actually happened, and
 
 ## 3. Confirmed requirements
 
-The product must support the following intended core capabilities. Their first-release depth remains subject to MVP approval.
+The product retains these capabilities across the four phases in Section 4; they are not all Phase 1 requirements.
 
 | Capability | Required behavior |
 | --- | --- |
-| Organize work | Represent courses, projects, personal goals, deadlines, and recurring commitments. |
+| Organize work | Connect monthly, semester-based and longer-term goals to milestone checklists and persistent tasks. Represent courses, playlists, college subjects, assignments, projects, research papers and other commitments, with deadlines, dependencies, effort and progress where applicable. |
 | Plan daily work | Generate realistic, editable daily plans using available time and priorities. |
 | Record actual work | Track planned work against actual progress and time spent. |
 | Forecast completion | Estimate completion dates using recorded progress and remaining workload. |
@@ -35,7 +35,7 @@ Do not claim completed features, performance, user validation, offline operation
 
 ### 3.1 Personal trajectory and persistent context
 
-**CONFIRMED REQUIREMENTS:** The navigator complements daily planning, progress tracking, overload detection, adaptive replanning, and data-grounded forecasts. Its release depth is subject to MVP approval.
+**CONFIRMED REQUIREMENTS:** The navigator complements daily planning, progress tracking, overload detection, adaptive replanning, and data-grounded forecasts. Its navigator depth belongs to Phase 3; daily planning and forecasting belong to Phase 2.
 
 The editable trajectory must represent long-term interests and goals; current learning priorities and commitments; courses, playlists, projects, and resources; relevant progress history and preferences; decisions and their reasons; and intentional detours or experiments with duration or review date where applicable.
 
@@ -51,31 +51,36 @@ When comparing a new activity or proposed plan with current priorities, explain 
 
 Advice must use available records, identify supporting context where practical, and ask for clarification when evidence is insufficient. Retrieval-augmented generation (RAG) may help find relevant records, but does not guarantee factual advice or eliminate hallucinations. Complete chat-history storage, embeddings, vector databases, and memory frameworks are not product requirements.
 
-## 4. Proposed MVP
+## 4. Phased release scope
 
-**PROPOSED MVP:** Deliver one complete planning loop for an individual user:
+**CONFIRMED SCOPE ALLOCATION:** Follow [Tasks.md](Tasks.md). This supersedes the earlier broad proposed MVP without removing its later capabilities.
 
-1. Describe career interests, learning activities, or goals in natural language; review and confirm the proposed trajectory details and actionable work items, including deadlines, remaining effort, and priorities.
-2. Enter available time and recurring commitments for the planning period.
-3. Request a daily plan in which the open-weight model meaningfully suggests work selection, ordering, or workload breakdown using the saved trajectory and current priorities. If it flags a possible mismatch, review its explanation and confirm whether the activity is an intentional exploration.
-4. Validate suggestions against application constraints and present a draft the user can edit and accept.
-5. Record time spent and progress against planned work.
-6. Recalculate completion estimates and highlight workload that cannot fit available capacity. Suggest revised plans for review without silently changing accepted plans or commitments.
-7. Inspect and correct the saved trajectory; confirm important changes and record or remove intentional detours and their reasons.
+1. **Phase 1 — Core MVP: Goal-to-Plan Assistant.** Capture a goal and clarify missing information; generate real, bounded open-weight task/milestone proposals; review, edit and explicitly approve; track task completion and actual work; persist and reopen goals, accepted plans and progress after restart. Include basic validation, correction/deletion and essential failure handling. An accepted goal work plan does not require a calendar date or daily time slots.
+2. **Phase 2 — Planning.** Organize competing goals, projects and commitments; build realistic daily schedules from availability, priorities, deadlines and dependencies; compare planned and actual work, detect overload, adapt plans and calculate evidence-based forecasts.
+3. **Phase 3 — Personal Career Navigator.** Connect planning to multiple interests, learning resources and longer-term ambitions using editable, user-confirmed context, decisions and intentional detours. Provide grounded guidance without forcing one career path.
+4. **Phase 4 — Advanced Capabilities.** Retain relevant historical-context retrieval, richer roadmap suggestions, exploration reviews and the Sketch Journal/artistic development module. Each extension needs separate scope approval.
 
-**Proposed simplifications:** Treat courses, projects, and goals as categories of work with actionable tasks; support recurring commitments as reserved time. Specialized course management, recurring-task automation, collaboration, external calendar synchronization, and notifications are not required by this proposed MVP.
+Phase 1 is a local, single-user app using the approved Python, Flask/Jinja, modular browser assets, SQLite/sqlite3, Pydantic and pytest direction. Daily calendar scheduling, automatic external calendar synchronization, hosted accounts and advanced career navigation are not Phase 1 requirements.
 
-These simplifications are recommendations, not settled exclusions from the long-term product.
+**Retained simplifications:** Categorize courses, projects and goals as work with actionable tasks; reserve recurring commitment time in Phase 2. Specialized course management, recurring-task automation, collaboration, external calendar synchronization and notifications need separate scope decisions.
 
-### 4.1 Minimal navigator slice
+### 4.1 Phase 3 navigator slice
 
-**PROPOSED MVP:** Use a compact, persistent trajectory profile containing multiple interests, current priorities, linked learning resources, preferences, and user-confirmed decisions. Allow short natural-language input to propose updates, with a visible review step before saving. Include simple detour records with a reason, scope, and optional duration or review date.
+**PHASE 3:** Use a compact, persistent trajectory profile containing multiple interests, current priorities, linked learning resources, preferences, and user-confirmed decisions. Allow short natural-language input to propose updates, with a visible review step before saving. Include simple detour records with a reason, scope, and optional duration or review date.
 
-Use this profile and relevant existing work/progress records for planning and activity-alignment explanations. Keep records and summaries inspectable and editable, with a deletion request action. Broad historical conversation retrieval and an autonomous long-term roadmap are not needed for this slice. This is a scope recommendation, not a technical storage or retrieval design; feasibility still depends on the challenge deadline and available resources.
+Use this profile and relevant existing work/progress records for planning and activity-alignment explanations. Keep records and summaries inspectable and editable, with a deletion request action. Broad historical conversation retrieval and an autonomous long-term roadmap are not needed for this slice. This is a scope recommendation, not a technical storage or retrieval design; detailed storage, retention and retrieval choices remain open.
 
-## 5. Proposed acceptance criteria
+### 4.2 Persistent work and daily contributions
 
-These criteria become release requirements only after the MVP is approved. Exact data fields and algorithms belong in later documents.
+Goals, milestone checklists and unfinished master tasks persist across days. For example, maintaining an 8+ GPA, finishing JavaScript and Computer Networking playlists, building two substantial projects, completing research papers and developing white papers should connect to appropriate milestones and tasks rather than form a flat list.
+
+In Phase 2, the user can describe tomorrow's intentions in natural language. AI uses goals, milestones, deadlines, available hours and unfinished work to propose priorities, adjustable time estimates, a useful minimum work session and an explanation of each task's contribution. The user edits and approves. Application logic enforces deadlines, dependencies and available time, reporting conflicts instead of promising impossible work.
+
+Record completion, partial progress, blockers, actual time and optional accomplishment/learning notes against persistent tasks. Recorded work informs task and milestone progress under reviewed update rules; time alone does not prove completion. Each day has its own plan and record of planned work; actual contributions and historical plans remain available. Next-day proposals account for missed work, changed deadlines, remaining capacity and actual progress, referencing existing tasks rather than blindly duplicating them. A new day creates a new plan, not a progress reset. Estimates stay editable and improve only where recorded evidence supports adjustment.
+
+## 5. Acceptance criteria by phase
+
+The four-phase allocation is confirmed; detailed fields, policies and algorithms remain subject to review. Phase 1 applies goal/task/milestone proposals, exact approval, task completion, actual-work recording, persistence, validation, correction/deletion and failures below. Daily scheduling, overload, forecasting and replanning apply in Phase 2; trajectory, alignment and detour checks apply in Phase 3.
 
 | Area | Observable acceptance criterion |
 | --- | --- |
@@ -98,7 +103,7 @@ Forecasts are estimates, not guarantees. Forecast assumptions, minimum data requ
 
 ## 6. Future scope
 
-**FUTURE IDEA:** A creative-practice journal for saving sketches and tracking artistic development. It is excluded from the initial MVP unless explicitly approved.
+**PHASE 4 — Sketch Journal / artistic development:** Retain a dedicated digital illustration journal: organize dated sketches; record practice sessions, time and personal notes; link sketches to exercises, skills or artistic goals; and compare selected sketches across time for reflection. Eventually, a suitable vision model may offer feedback and practice suggestions on gesture, proportions, perspective and values. Distinguish visual observations from subjective judgments, communicate uncertainty and never claim objective measurement of artistic ability without evidence. This is a long-term practice module, not a generic attachment feature or a Phase 1 dependency. Architecture, media storage, privacy, model choice and evaluation remain explicitly open; no tables or integration design are specified here.
 
 **FUTURE IDEAS / PROPOSED EXTENSIONS:** Rich retrieval across historical notes or selected conversation context; longer-term learning-roadmap suggestions grounded in the trajectory; and richer exploration reviews across multiple detours. Each requires separate scope approval. If historical retrieval is added, retrieved context must remain inspectable, correctable, and subject to deletion controls; retrieval must not convert historical or outdated statements into current commitments without confirmation.
 Other enhancements require a separate scope decision; their mention does not authorize implementation.
@@ -108,21 +113,21 @@ Other enhancements require a separate scope decision; their mention does not aut
 | Open decision | Input needed and consequence |
 | --- | --- |
 | Challenge eligibility | Obtain the official challenge name and rules/link, deadline, required artifacts, and AI usage criteria. Model eligibility and submission compliance cannot yet be claimed. |
-| MVP approval | Confirm or revise Section 4 and its acceptance criteria before treating them as release commitments. |
-| Navigator release scope | Approve or revise the minimal slice in Section 4.1 and the associated acceptance criteria; confirm which historical retrieval and roadmap features remain future scope. |
+| Phase details | Four-phase allocation is confirmed; review detailed milestone/progress, dependency, minimum-session and acceptance policies before dependent implementation. |
+| Navigator details | Review Section 4.1's Phase 3 depth; historical retrieval, richer roadmaps and Sketch Journal remain Phase 4 until separately scoped. |
 | Trajectory review rules | Define which edits count as important goal or commitment changes, how current priorities supersede older decisions, and what the user sees when a detour reaches its review date. AI-proposed important changes always require confirmation. |
 | Memory and deletion boundaries | Define stored context categories, retention, deletion completion expectations, and treatment of derived summaries or copies. Corrected or deleted information must cease influencing advice once the change completes; no complete chat archive is assumed. |
 | Delivery constraints | Confirm development timeframe, budget, target platform, and available hardware or hosted inference access. These constrain feasible scope and architecture. |
-| User and hosting model | Decide whether the initial release is a local single-user tool or a hosted application, and whether accounts are needed. This affects persistence, security, and deployment. |
+| User and hosting model | Local single-user Phase 1 is confirmed. Hosted/multi-user access needs separate scope, security and deployment decisions. |
 | Planning semantics | Decide planning horizon, time granularity, deadline interpretation, and how timezone and recurring commitments are handled. |
 | Progress and forecasting | Decide progress units, remaining-effort updates, minimum history, capacity assumptions, and how uncertainty is communicated. |
-| AI and stack | Evaluate the model, license, inference method, framework, database, and deployment together. No particular technology is selected here. |
+| AI and stack | Python, Flask/Jinja, SQLite/sqlite3, Pydantic and pytest are approved. Running.md and Model_Verification.json record existing model/runtime evidence; challenge eligibility and broader quality require separate verification. |
 | Data handling | Determine what information is sent to inference services and how it is stored and retained before making privacy claims. |
 
-Challenge requirements must remain visible here and later in `setup/Submission.md`. No official rules have been supplied or verified during this documentation step.
+Challenge requirements must remain visible here and later in `setup/submission.md`. No official rules have been supplied or verified during this documentation step.
 
 ## 8. Documentation boundaries
 
-Later documents will cover design (`setup/Design.md`), architecture (`setup/Architecture.md`), storage (`setup/Database.md`), AI integration (`setup/AI_Integration.md`), and verification (`setup/Testing.md`). These are planned documents, not existing artifacts.
+Existing documents cover design (`setup/Design.md`), architecture (`setup/Architecture.md`), storage (`setup/Database.md`), AI integration (`setup/AI_Integration.md`) and verification (`setup/Testing.md`). Running.md and implementation reports describe current build evidence; specifications alone do not prove completion.
 
-This document authorizes no framework initialization, dependency installation, application code, or deployment. Each subsequent setup document requires explicit approval under the one-file workflow.
+This document authorizes no framework initialization, dependency installation, application code, or deployment. This request authorizes documentation alignment one file at a time; implementation and later scope changes require separate authorization.

@@ -1,0 +1,23 @@
+{% macro field(key, label, value, name, limit=1200, rows=0, numeric=false) %}
+<div class="field"><label for="{{ name }}">{{ label }}</label>
+{% if rows %}<textarea data-key="{{ key }}" id="{{ name }}" name="{{ name }}" rows="{{ rows }}" maxlength="{{ limit }}" required>{{ value }}</textarea>
+{% else %}<input data-key="{{ key }}" id="{{ name }}" name="{{ name }}" {% if numeric %}type="number" min="1" max="10080" step="1"{% else %}required maxlength="{{ limit }}"{% endif %} value="{{ value if value is not none else '' }}">{% endif %}</div>
+{% endmacro %}
+{% macro task_editor(task, mi, ti) %}
+<fieldset data-task><legend>Task <span data-number>{{ ti+1 }}</span></legend>
+{{ field('title', 'Task title', task.get('title', ''), 'm'~mi~'_t'~ti~'_title', 160) }}
+{{ field('description', 'What needs to be done?', task.get('description', ''), 'm'~mi~'_t'~ti~'_description', 1200, 3) }}
+{{ field('estimated_minutes', 'Suggested effort in minutes (blank means unknown)', task.get('estimated_minutes'), 'm'~mi~'_t'~ti~'_estimated_minutes', numeric=true) }}
+<div class="editor-controls"><button type="button" class="secondary" data-action="up-task">Move task up</button><button type="button" class="secondary" data-action="down-task">Move task down</button><button type="button" class="secondary" data-action="remove-task">Remove task</button></div>
+</fieldset>
+{% endmacro %}
+{% macro milestone_editor(milestone, mi) %}
+<fieldset data-milestone><legend>Milestone <span data-number>{{ mi+1 }}</span></legend>
+{{ field('title', 'Milestone title', milestone.get('title', ''), 'm'~mi~'_title', 160) }}
+{{ field('completion_criterion', 'Observable completion checkpoint', milestone.get('completion_criterion', ''), 'm'~mi~'_completion_criterion', 800, 3) }}
+<input type="hidden" data-task-count name="m{{ mi }}_task_count" value="{{ milestone.tasks|length }}">
+<div data-tasks>{% for task in milestone.tasks %}{{ task_editor(task, mi, loop.index0) }}{% endfor %}</div>
+<button type="button" class="secondary" data-action="add-task">Add task</button>
+<div class="editor-controls"><button type="button" class="secondary" data-action="up-milestone">Move milestone up</button><button type="button" class="secondary" data-action="down-milestone">Move milestone down</button><button type="button" class="secondary" data-action="remove-milestone">Remove milestone</button></div>
+</fieldset>
+{% endmacro %}

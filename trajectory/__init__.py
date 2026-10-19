@@ -25,4 +25,8 @@ def create_app(test_config=None):
         storage.initialize()
     from .routes import bp
     app.register_blueprint(bp)
+    from .review_routes import bp as review_bp
+    app.register_blueprint(review_bp)
+    from .work_routes import bp as work_bp
+    app.register_blueprint(work_bp)
     return app

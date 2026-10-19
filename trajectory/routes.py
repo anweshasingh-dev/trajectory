@@ -3,7 +3,7 @@ import secrets
 import sqlite3
 from uuid import uuid4
 from flask import current_app
-from . import draft_storage, planning
+from . import draft_storage, planning, review_storage
 from .ai import OllamaAdapter, InferenceError
 from flask import Blueprint, abort, redirect, render_template, request, session, url_for
 from pydantic import ValidationError
@@ -25,7 +25,7 @@ def template_helpers():
     return {"csrf_token": csrf_token, "generation_id": lambda: str(uuid4())}
 
 
-@bp.before_request
+@bp.before_app_request
 def protect_forms():
     if request.method == "POST":
         supplied = request.form.get("csrf_token", "")
@@ -45,7 +45,8 @@ def detail(goal_id):
         abort(404)
     return render_template("workspace.html", goals=storage.list_goals(), goal=goal,
                            saved=request.args.get("saved") == "1", questions=questions_for(goal),
-                           draft=draft_storage.latest_draft(goal_id))
+                           draft=review_storage.draft_for_review(latest["id"]) if (latest := draft_storage.latest_draft(goal_id)) else None,
+                           approved=review_storage.current_plan(goal_id))
 
 
 @bp.route("/goals/new", methods=["GET", "POST"])
@@ -98,5 +99,7 @@ def generate(goal_id):
     if goal is None:
         abort(404)
     return render_template("workspace.html", goals=storage.list_goals(), goal=goal,
-                           questions=questions_for(goal), draft=draft_storage.latest_draft(goal_id),
+                           questions=questions_for(goal),
+                           draft=review_storage.draft_for_review(latest["id"]) if (latest := draft_storage.latest_draft(goal_id)) else None,
+                           approved=review_storage.current_plan(goal_id),
                            generation_error=message), status
