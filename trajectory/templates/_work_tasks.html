@@ -4,7 +4,10 @@
   <strong>{{ task.title }}</strong>
   <p class="preserve">{{ task.description }}</p>
   <p class="muted">Estimated effort: {% if task.estimated_minutes is none %}Unknown{% else %}{{ task.estimated_minutes }} minutes{% endif %}</p>
-  <a href="{{ url_for('work.edit', goal_id=goal.id, kind='tasks', item_id=task.id) }}">Edit task <span class="muted">? {{ task.title }}</span></a>
+  {% set progress = summaries[task.id] %}
+  <p><strong>{{ {'open':'To do','in_progress':'In progress','completed':'Completed'}[progress.status] }}</strong>{% if progress.measured_entries %} - {{ progress.actual_minutes }} minutes recorded{% endif %}{% if progress.blocker %} - Blocked: {{ progress.blocker }}{% endif %}</p>
+  <p><a href="{{ url_for('progress.detail', goal_id=goal.id, task_id=task.id) }}">View work history</a> - <a href="{{ url_for('progress.edit', goal_id=goal.id, task_id=task.id, outcome='reopened' if progress.status == 'completed' else 'completed') }}">{{ 'Reopen task' if progress.status == 'completed' else 'Mark complete' }}</a></p>
+  <a href="{{ url_for('work.edit', goal_id=goal.id, kind='tasks', item_id=task.id) }}">Edit task <span class="muted">- {{ task.title }}</span></a>
 </li>
 {% else %}<li class="muted">No tasks here yet.</li>{% endfor %}
 </ol>

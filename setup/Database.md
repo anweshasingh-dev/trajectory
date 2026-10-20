@@ -5,18 +5,18 @@
 
 ## 1. Read this first
 
-**Confirmed direction:** SQLite/sqlite3 for a local, single-user Phase 1 app, as approved in Tasks.md. The detailed schema below remains proposed and spans later phases; it is not a 12-table MVP requirement. Keep ordinary facts in relational tables; reserve validated JSON for temporary proposals and source references.
+**Confirmed direction:** SQLite/sqlite3 for a local, single-user Phase 1 app, as approved in Tasks.md. The detailed schema below remains a retained cross-phase proposal, not a current 12-table requirement or an instruction to implement it. Keep ordinary facts in relational tables; reserve validated JSON for temporary proposals and source references.
 
 | Label | Meaning here |
 | --- | --- |
-| Phased data | Phase 1 needs goal/milestone/task proposals, accepted non-calendar plans and actual work. Daily capacity/plans are Phase 2; trajectory context is Phase 3. Catalogue detail is still a proposal. |
+| Current data boundary | Goal/checkpoint plans, persistent to-dos, daily proposals and recorded completion/progress. The simple daily planner is current; calendar windows/blocks, navigator context and forecasting are deferred. Catalogue detail is still a proposal. |
 | Proposed rule | A concrete recommendation that still needs review before implementation. |
 | Future | Not required for the initial schema; add only after scope approval. |
 | OPEN DECISION | A choice that affects data meaning or delivery and remains unsettled. |
 
 **Legend:** PK = primary key, the unique identity of a row. FK = foreign key, a reference to another row. NN = required/non-null. NULL = absent or unknown, not zero. UNIQUE prevents duplicate values. CHECK limits allowed values. “Service rule” means application code must validate it; a foreign key alone cannot enforce it.
 
-### Data map
+### Retained cross-phase data map
 
 ```mermaid
 flowchart LR
@@ -51,13 +51,17 @@ Arrows show the main ownership/reference paths, not every FK. The tables below d
 
 ## 3. Phased table catalogue
 
-### Phase 1 relationships and remaining schema review
+### Current relationships and remaining storage review
 
-Phase 1 requires persistent goals linked to meaningful milestones/checklists and actionable master tasks, ordered draft/accepted goal plans, exact acceptance/version history and correctable actual-work records. A goal plan must not require a calendar date, requested daily minutes or scheduled blocks. Tasks need stable identities across plan membership so unfinished work and contributions survive replacement and restart.
+Current persistence serves only Product.md Section 4's two features: goal plans with checkpoints, standalone or linked to-dos, daily proposals and recorded completion/progress. Tasks need stable identities across days and plans. Completed tasks remain recorded, unfinished tasks remain available and a new plan does not reset progress or duplicate tasks. Goal/milestone association is not required for a standalone to-do.
 
-The existing Sections 3.7–3.9 describe **Phase 2 daily scheduling only**; they cannot stand in for this non-calendar goal-plan relationship. Running.md documents the current draft JSON, approved snapshots and task membership. A reviewed schema change must account for those existing records instead of assuming this catalogue is already implemented. Dedicated milestone identity, checklist state, task-to-milestone linkage and progress roll-up remain OPEN DECISION; no new tables/columns are selected here.
+The four allowed deadline choices are owned by Product.md. Storage must preserve the user's choice and the agreed deadline meaning across replanning; it must not silently renew a duration each day. Whether to retain a duration, an anchor, a resolved date or a combination is OPEN DECISION, alongside timezone/day boundaries and overdue handling. No column, enum encoding or migration is selected here.
 
-Required contribution semantics: record completion, partial progress, blockers, actual time and optional accomplishment/learning notes against persistent tasks and their milestone context. Work logs are distinct from planned allocations and task state; recorded work informs progress under approved update rules. Elapsed time alone never completes a task or milestone.
+Daily allocations are proposals distinct from persistent to-dos and actual progress. Available time does not require recurring windows, calendar integration or scheduled blocks. Decide minimal plan retention/replacement and completion/progress detail against existing storage; no daily-plan table set is approved by this update.
+
+Running.md documents existing proposal JSON, approved snapshots and task membership. Review compatibility with those records before any separately authorized migration. Lightweight checkpoint representation remains open; automatic milestone/checklist management, quantity roll-up, detailed blocker/time logs and forecasts are deferred.
+
+**Catalogue boundary:** Sections 3.1-3.12 and Sections 4-7 retain earlier schema/lifecycle proposals for reference, not a package to build now. Reuse relevant existing structures where sufficient. In particular, 3.6's recurring windows and 3.9's time-slot blocks are deferred; 3.7-3.8 are not the selected implementation for the simple daily planner. No new tables or modules are introduced.
 
 ### A. Personal trajectory and organized work
 
@@ -85,7 +89,7 @@ No account, password, or email fields are proposed. Before public multi-user acc
 | `status` | TEXT NN; active / paused / completed / archived | Organization state. |
 | Common columns | As Section 2 | Correction metadata. |
 
-Proposed simplification: no general nested project hierarchy or separate learning-roadmap graph in Phase 1. This does not remove the required goal-to-milestone-to-task relationships described above. Multiple career interests live in context records and may relate to work items.
+No general nested project hierarchy or learning-roadmap graph is required now. Goal checkpoints provide structure without requiring automatic milestone management. Course categories and career-interest context below remain deferred catalogue ideas.
 
 #### 3.3 `tasks` — actionable workload
 
@@ -102,7 +106,7 @@ Proposed simplification: no general nested project hierarchy or separate learnin
 | `remaining_effort_minutes` | INTEGER NULL, CHECK >= 0 | Separate current scheduling estimate. |
 | Common columns | As Section 2 | Revision and corrections. |
 
-Service rules: require `progress_unit` when remaining quantity is present. No implicit conversion between pages, lessons, and minutes. Unknown effort is NULL and triggers clarification before scheduling; zero effort is not unknown. Proposed deadline policy: use the earlier applicable parent/task deadline, flag conflicts, and never silently move one. This policy requires approval.
+Deferred catalogue service rules (not current to-do prerequisites): require `progress_unit` when remaining quantity is present. No implicit conversion between pages, lessons, and minutes. Unknown effort is NULL and triggers clarification before scheduling; zero effort is not unknown. Proposed deadline policy: use the earlier applicable parent/task deadline, flag conflicts, and never silently move one. This policy requires approval.
 
 Changing a task's unit after progress exists requires an explicit reviewed conversion or reset of affected quantities/history; never relabel existing measurements. Do not automatically subtract time spent from remaining quantity. Until a progress-update policy is approved, save completed quantity and any revised remaining quantity as distinct user-confirmed inputs in one transaction.
 
@@ -145,7 +149,7 @@ Either, both, or neither relationship may be present. Proposed catalogue limit: 
 
 ### B. Capacity, plans, and actual work
 
-Sections 3.6–3.9 are Phase 2 proposals; Section 3.10 describes actual-work semantics needed from Phase 1, with optional scheduled-block linkage added later. Context records in 3.4 and navigator resource use in 3.5 belong to Phase 3, not MVP prerequisites.
+Sections 3.6-3.9 retain deferred interval-scheduling proposals. Current daily planning needs only user-supplied available time and proposed task allocations; it does not approve these tables. Section 3.10's richer measurements remain proposed: current completion/progress recording must not require invented minutes or quantities. Context records in 3.4 and navigator resource use in 3.5 remain deferred.
 
 #### 3.6 `time_windows` — availability and reserved commitments
 
@@ -163,7 +167,7 @@ Sections 3.6–3.9 are Phase 2 proposals; Section 3.10 describes actual-work sem
 | `status` | TEXT NN; active / archived | Whether used in planning. |
 | Common columns | As Section 2 | Correction metadata. |
 
-DB/service rules: exactly the fields for the chosen pattern; end > start. Proposed MVP represents overnight windows as two dated/rule intervals and does not add a general recurrence engine. DST-ambiguous/nonexistent local times require an approved policy or clarification, not silent server conversion. Exceptions use edits/split date ranges until a richer recurrence scheme is approved.
+DB/service rules: exactly the fields for the chosen pattern; end > start. Deferred interval-scheduling proposal represents overnight windows as two dated/rule intervals and does not add a general recurrence engine. DST-ambiguous/nonexistent local times require an approved policy or clarification, not silent server conversion. Exceptions use edits/split date ranges until a richer recurrence scheme is approved.
 
 Calculate capacity from the union of availability intervals minus the union of commitments. Overlapping availability must not double-count time, and a commitment outside availability must not create negative capacity. Store rules; derive concrete occurrences for the selected planning horizon rather than duplicating them as authoritative rows.
 
@@ -220,7 +224,7 @@ No common columns: the owning plan controls edits and versioning. Multiple block
 
 Proposed measurement rule: require positive minutes or positive completed quantity; reject empty entries. **OPEN GAP:** This rule alone cannot represent a blocker-only, completion-only or notes-only contribution. Review that distinction before actual-work implementation; it must not force invented time/quantity or discard those required records. Service verifies that an optional block belongs to this task/profile. Unit changes are restricted as in Section 3.3. Logging an unscheduled task is valid. Deleting a plan removes the optional association, not the independently recorded actual work.
 
-Forecasts are Phase 2 derived results, not authoritative database rows in this proposal. Calculate from validated progress, remaining workload, and explicit future-capacity assumptions; expose the formula/version and missing data in the result. Do not sum incompatible task units into a goal total. Goal roll-up and rate estimation remain OPEN DECISION; without comparable evidence return an unavailable estimate. Historical forecast snapshots can be added later if approved.
+Deferred forecasts are Phase 2 derived results, not authoritative database rows in this proposal. Calculate from validated progress, remaining workload, and explicit future-capacity assumptions; expose the formula/version and missing data in the result. Do not sum incompatible task units into a goal total. Goal roll-up and rate estimation remain OPEN DECISION; without comparable evidence return an unavailable estimate. Historical forecast snapshots can be added later if approved.
 
 ### C. Approval and deletion lifecycle
 
@@ -299,7 +303,7 @@ Correcting progress updates that row rather than storing a hidden copy of the in
 
 ## 6. Sources, confirmations, and version checks
 
-Source manifests are JSON lists of `{record_type, record_id, version}` with an allowlisted type and an existing same-profile record. They are for summary/proposal provenance only, not SQL joins or a second source of goals and progress. Unlike a real FK, the database cannot enforce these references: services validate them on save/use and invalidate them on correction/deletion. This explicit MVP trade-off avoids a table per source type; reconsider typed relationship tables if provenance needs grow.
+Source manifests are JSON lists of `{record_type, record_id, version}` with an allowlisted type and an existing same-profile record. They are for summary/proposal provenance only, not SQL joins or a second source of goals and progress. Unlike a real FK, the database cannot enforce these references: services validate them on save/use and invalidate them on correction/deletion. This retained catalogue trade-off avoids a table per source type; reconsider typed relationship tables if provenance needs grow.
 
 User-approved structured records are saved facts about stated preferences and recorded work; model interpretations remain labeled suggestions. A reference proves a record exists, not that advice correctly interprets it. RAG, embeddings, a vector database, and stored full conversations are not prerequisites.
 
@@ -327,8 +331,8 @@ Later tests must cover FK enforcement per connection, invalid values/relationshi
 
 | Data by phase; detailed schema still proposed | Future only; no tables proposed now |
 | --- | --- |
-| Phase 1: goals, milestone/task links, accepted ordered plans and actual work; Phase 2: broader work/resources and local time rules | External calendar sync and rich recurrence/exceptions |
-| Phase 2: daily plans, considered tasks and scheduled blocks linked to persistent tasks/actual work | Multi-day roadmap graphs and historical forecast snapshots |
+| Current: goal/checkpoint plans, persistent to-dos, daily proposals, completion/progress; representation pending review | External calendar sync and rich recurrence/exceptions |
+| Deferred Phase 2: recurring time rules and scheduled blocks, broader commitments and advanced forecasting | Multi-day roadmap graphs and historical forecast snapshots |
 | Phase 3: multiple interests, preferences, confirmed decisions/detours and approved summaries | Broad conversation/note retrieval and embedding indexes |
 | Temporary exact-change proposals and deletion status | Collaboration, accounts, permissions and multiple users |
 | Validated progress and remaining effort | Phase 4 Sketch Journal; media/storage/privacy and vision-model decisions explicitly open (Product.md Section 6) |
@@ -340,10 +344,11 @@ No persistent “distraction score” or automatic career-path classification is
 | OPEN DECISION | Recommendation to review |
 | --- | --- |
 | Later deployment | Local single-user scope is confirmed; the singleton profile remains a schema proposal. Hosted multi-user access needs revised ownership/authentication approval. |
-| Phase 1 relationships | Review non-calendar ordered plans, milestone identity/checklists, task membership/history and contribution updates against current storage. No daily-plan or navigator tables are required to begin Phase 1. |
-| Progress measurement | Task-specific units plus separate minutes; approve precision, remaining-work correction policy, forecast rate evidence and goal roll-up. |
-| Time semantics | Approve IANA timezone handling, weekly/one-off recurrence, midnight splitting, DST policy, and parent/task deadline precedence. |
-| Plan lifecycle | Review Phase 1 goal-plan acceptance and stable task membership separately from Phase 2 daily plans/one accepted plan per date. Confirm carry-forward, dependency and minimum-session semantics; preserve histories and actual work. |
+| Current relationships | Review minimal goal/checkpoint, stable to-do, daily-proposal and completion/progress representations against existing storage. No automatic milestone management or new table set is selected. |
+| To-do deadlines | Decide anchor, calendar-day/elapsed interpretation, timezone/day and due-time boundaries, overdue behavior and explicit changes before choosing a storage encoding. |
+| Current progress | Decide minimum completion/progress detail and correction behavior. Rich measurement units, forecast evidence and milestone roll-up are later decisions. |
+| Deferred time semantics | Weekly/one-off recurrence, midnight splitting, DST scheduling policy and parent/task deadline precedence are not current prerequisites. |
+| Plan lifecycle | Review goal-plan acceptance plus daily-proposal retention/replacement, stable task references and recorded progress. One accepted plan/date remains a proposal, not a selected rule. Dependency/minimum-session policies are deferred. |
 | Context structure | Typed shared context table; approve important-change boundaries, summary provenance and review-date behavior. |
 | Retention/deletion | Approve proposal expiry, historical-record deletion choices, completed request metadata retention, backup expiry and external-provider handling. |
 | Persistence setup | Confirm SQLite on the actual deployment storage, supported version, migrations and durable backup/restore process. |

@@ -2,7 +2,7 @@
 
 **Turn ambition into a plan you can follow—and revise.**
 
-> **Incremental Phase 1 build:** Goal capture, clarification and restart persistence are implemented. Local AI draft generation is implemented; two real-model smoke checks passed, with evidence recorded separately. Draft editing, rejection and exact-revision approval are implemented. Actual-work tracking remains pending. Status reviewed on October 19, 2026.
+> **Core MVP in progress:** Goal capture, local AI draft generation, review and approval, persistent milestones/tasks, and dated actual-work tracking are implemented. Two real-model generation checks are recorded separately. Daily planning remains to be built. Status updated October 19, 2026.
 
 ## Overview
 
@@ -16,7 +16,7 @@ Trajectory aims to turn that description into proposed tasks and milestones, ask
 
 ## Key features
 
-**Implemented:** Create/edit/reopen goals, explicit clarification answers, validated local AI draft-generation workflow, saved drafts, editing/reordering, explicit rejection/approval and stale-context protection. **Pending:** Actual-work tracking and complete Phase 1 verification. The table below describes the full phase boundaries.
+**Implemented:** Create/edit/reopen goals, clarification, validated local AI drafts, review/approval, persistent milestone/task editing, dated work entries, partial progress, completion, blockers, corrections and reopening. **Pending:** Daily planning and complete end-to-end MVP verification. The table below describes the earlier phase boundaries.
 
 | Scope | Planned capabilities |
 | --- | --- |
@@ -25,7 +25,7 @@ Trajectory aims to turn that description into proposed tasks and milestones, ask
 | Phase 3 Personal Career Navigator | Multiple career interests, editable persistent preferences/decisions, relevant learning resources, alignment advice and intentional detours. |
 | Phase 4 future possibilities | Historical-note retrieval/RAG, richer learning roadmaps, exploration reviews and the dedicated Sketch Journal/artistic development module. Each needs separate scope approval. |
 
-Goals, milestone checklists and unfinished master tasks persist; each later daily plan records its own intended work without resetting progress or blindly duplicating tasks. Recorded completion, partial work, blockers, time and optional learning notes inform progress and subsequent proposals. These are planned behaviors; actual-work tracking remains pending.
+Goals, milestone checklists and master tasks persist. Dated work entries record explicit completion, partial work, blockers, actual minutes and optional notes; corrections recalculate task status and milestone completion counts. Future daily plans will reference these same tasks and work records.
 
 The future Sketch Journal preserves dated sketches, practice/time/notes, exercise/skill/goal links and comparisons across time, with eventual vision-assisted feedback and practice suggestions that communicate uncertainty. Its architecture, storage, privacy and model choices remain open; see [the full artistic vision](setup/Product.md#6-future-scope).
 
@@ -53,9 +53,9 @@ Possible monetization includes a one-time local-app purchase or paid convenience
 
 ## Current development status
 
-The first working slices support goal capture, correction, explicit unknown/no-deadline clarification, local structured proposal generation and SQLite restart persistence. Invalid responses are rejected, changed goal context invalidates generation, and failed attempts preserve earlier saved drafts. Plan review/edit/approval is implemented with immutable approved snapshots and retained task identities. Actual-work records remain pending.
+The first working slices support goal capture, correction, explicit unknown/no-deadline clarification, local structured proposal generation and SQLite restart persistence. Invalid responses are rejected, changed goal context invalidates generation, and failed attempts preserve earlier saved drafts. Plan review/edit/approval is implemented with immutable approved snapshots and retained task identities. Direct task/milestone editing and dated actual-work records are implemented with correction, removal and restart persistence.
 
-Automated tests cover goal persistence and validation, clarification, draft lifecycle and inference failure paths. These use fake adapters for repeatability; a live model smoke check is separate and does not establish broad plan quality. Setup documents distinguish phased requirements from technical proposals; Tasks.md retains its earlier tracking snapshot without certifying completion; [Running.md](setup/Running.md) describes the implemented slice.
+Automated tests cover goal persistence, clarification, draft/review lifecycle, task identity, dated progress, corrections, migrations and inference failure paths. These use fake adapters for repeatability; a live model smoke check is separate and does not establish broad plan quality. Setup documents distinguish phased requirements from technical proposals; Tasks.md retains its earlier tracking snapshot without certifying completion; [Running.md](setup/Running.md) describes the implemented slice.
 
 ## Technology stack
 

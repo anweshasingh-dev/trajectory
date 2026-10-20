@@ -5,11 +5,12 @@
 <div class="page-intro"><div><p class="eyebrow">Saved work</p><h1>{{ goal.title }}</h1><p class="muted">Keep your milestones and task lists here. Changes save directly to your work.</p></div></div>
 {% if saved %}<p class="notice" role="status">Work saved.</p>{% endif %}
 <p class="form-actions"><a class="button" href="{{ url_for('work.edit', goal_id=goal.id, kind='tasks') }}">New task</a><a class="button secondary" href="{{ url_for('work.edit', goal_id=goal.id, kind='milestones') }}">New milestone</a></p>
-<p class="muted">Manual additions and edits are preserved when you approve another proposal. Approved snapshots keep their original wording. Completion and work logging come in the next part.</p>
+<p class="muted">Record dated progress and actual time against each task. Task completion is explicit; time spent alone does not complete work.</p>
 {% for milestone in milestones %}
 <section class="draft-section">
   <h2>{{ milestone.title }}</h2>
   <p class="preserve"><strong>Checkpoint:</strong> {{ milestone.completion_criterion }}</p>
+  <p class="muted">{{ counts[milestone.id].completed }} of {{ counts[milestone.id].total }} tasks completed</p>
   <a href="{{ url_for('work.edit', goal_id=goal.id, kind='milestones', item_id=milestone.id) }}">Edit milestone</a>
   {% set members = tasks|selectattr('milestone_id', 'equalto', milestone.id)|list %}
   {% include '_work_tasks.html' %}
@@ -21,4 +22,5 @@
   {% include '_work_tasks.html' %}
 </section>
 {% if not milestones and not tasks %}<p class="muted">Add work manually, or approve a proposal from your goal.</p>{% endif %}
+{% if archived %}<section class="draft-section"><h2>Archived tasks</h2><p class="muted">Their dated work remains available for review and correction.</p><ul>{% for task in archived %}<li><a href="{{ url_for('progress.detail', goal_id=goal.id, task_id=task.id) }}">{{ task.title }}</a></li>{% endfor %}</ul></section>{% endif %}
 {% endblock %}

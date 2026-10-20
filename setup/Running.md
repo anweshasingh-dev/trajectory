@@ -1,6 +1,6 @@
 # Running the first application slice
 
-Implemented: create, list, reopen and edit goals; deterministic clarification questions and explicit unknown/no-deadline answers with SQLite persistence, input validation and stale-edit protection. This is an incremental build, not the complete Phase 1 MVP. Local model generation and persistent draft display are implemented. Draft editing, rejection and approval are implemented. Progress logging and deletion are not implemented yet.
+Implemented: goal capture and clarification, local model proposals, draft review and approval, persistent milestone/task editing, and dated actual-work logging with correction and entry removal. This is an incremental build, not the complete Core MVP. Goal and task deletion are still pending.
 
 Verified environment: Windows, Python 3.14.5. From the repository root in PowerShell:
 
@@ -65,8 +65,17 @@ Approval, rejection and draft edits recheck the goal source revision and draft r
 
 The additive tables are `draft_reviews`, `approved_plans`, `approved_tasks` and `approved_plan_tasks`; existing goal/draft rows are preserved. Older drafts without a review row are read as revision 1 in Draft state. Approved snapshots are immutable and one plan per goal can be current. Original AI provenance is retained, while the approved draft revision identifies the human-reviewed content.
 
-Unchanged tasks in an immediately preceding current plan retain their IDs, matched by exact title, description and suggested effort, in prior order for duplicates. A changed task gets a new identity; removed tasks are archived rather than deleted. Historical memberships and snapshots remain. Moving an unchanged task between milestones preserves its identity. Progress records are not yet implemented; future corrections must preserve this distinction.
+Proposal imports reuse matching task identities and preserve direct edits. Removed proposal-managed tasks are archived, while manual work and historical approved snapshots remain. Dated work entries stay linked to task IDs through plan replacement and can be corrected after a task is archived.
 
 A changed goal labels the existing approved plan as needing review rather than deleting it. Old-source drafts cannot be edited or approved. Open questions/assumptions remain visible; users can revise or remove them before approval. The editor does not change confirmed goal context.
 
 Verification: 50 automated cases pass, including rejection, stale/duplicate/concurrent approval, invalid edited data, exact-revision persistence, retained task identity and rollback after a partial replacement attempt. An isolated headless Chrome check passes add/remove/reorder, input naming, bounds and entered-data retention. [Review_Verification.json](Review_Verification.json) records the separate real-model edit/approve/restart smoke check. This is not a broad visual accessibility audit or a quality guarantee for model suggestions.
+
+
+## Saved work and actual progress (Core MVP Parts 1-2)
+
+Open a goal and choose **Manage milestones and tasks**. Add or edit tasks directly, link them to a milestone, or leave them under the goal. Task identities survive direct edits and matching plan replacements. The saved-work page shows current task states and each milestone's completed-task count.
+
+Choose **View work history** on a task to record a dated partial-progress, completion or reopening entry. Actual minutes may be blank (unknown) or 0 (known zero); notes and blockers are optional. A blocker remains visible until cleared or the task is completed. Completion requires an explicit entry; minutes alone never complete a task. **Correct entry** updates a mistaken record, and **Remove mistaken entry** removes it after confirmation. Task state, blockers and recorded-time totals are recalculated from dated entries. Archived tasks retain readable, correctable history.
+
+Startup applies versioned SQLite migrations without recreating existing goals, plans or task IDs. Tests use temporary databases. The local browser must reach a restarted Flask server to load new routes and templates. The automated suite currently passes 87 cases; this does not establish visual accessibility or broad model quality. Daily intentions, capacity-aware schedules and carry-forward are later Core MVP parts.

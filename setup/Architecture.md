@@ -11,14 +11,16 @@ Source of truth: `setup/Product.md`, with release allocation in `setup/Tasks.md`
 Browser: templates + reusable UI + page-specific CSS/JavaScript
     -> routes: parse requests and return HTML or JSON
     -> application services: coordinate validated actions and approvals
-        -> scheduling / progress / forecasting: deterministic calculations
-        -> context service -> AI orchestration -> inference adapter -> model
+        -> input / allocation validation and recorded task progress
+        -> bounded task context -> AI orchestration -> inference adapter -> model
         -> repositories -> structured database
 ```
 
 The browser never talks directly to the model or database. Application services, rather than the model, authorize and persist changes. Modules receive explicit dependencies and inputs; avoid scattered mutable global state. Configuration and connection factories may be shared through the application factory.
 
-**Phase 1 target:** Goal capture/clarification, bounded task/milestone proposals, editable ordered goal plans, exact approval, persistent tasks and actual-work tracking with restart persistence. **Phase 2** adds competing commitments, daily schedules, overload, planned-versus-actual and evidence-based forecasts. **Phase 3** adds the trajectory profile, resources, decisions, detours and grounded alignment explanations. The components below describe responsibilities across these phases, not a requirement to build all modules in Phase 1.
+**Current initial target (Product.md Section 4):** Goal-to-Plan and the simple Daily To-do Planner. The existing work, planning, progress, AI and persistence responsibilities support goal/checkpoint proposals, persistent to-dos, recorded completion/progress and fresh daily allocation proposals. No new service or module is selected here.
+
+**Deferred:** Time-slot scheduling, recurring commitments, advanced overload/forecasting, course schedule/deadline imports, complex course management, automatic milestone management and autonomous agents. Phase 3 trajectory/context and Phase 4 advanced components below remain future responsibilities, not current dependencies.
 
 **Future extensions:** Broad historical-note/conversation retrieval, longer-term roadmap suggestions, and richer exploration reviews. Support these through existing context and AI interfaces only when approved; do not build unused infrastructure now. The Sketch Journal/artistic development module remains Phase 4; its architecture, storage, privacy and vision-model integration are open. See Product.md Section 6 for retained behavior. No visual layouts, animations, transitions, or detailed screen journeys are settled here.
 
@@ -50,19 +52,19 @@ Ollama's [structured-output documentation](https://docs.ollama.com/capabilities/
 | -------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------- |
 | Frontend                   | Input forms, draft editing, confirmation, validation feedback, source visibility, reusable UI.                                          | Authoritative scheduling, secrets, SQL, or model calls.                             |
 | Routes                     | Request parsing, identity scope when applicable, calling services, HTML/JSON responses.                                                 | Business calculations or database queries.                                          |
-| Work service               | Persistent goals, milestone/task relationships and validated edits; categorized courses/projects, resource references and commitments as phased.                           | Specialized course tooling or resource scraping.                                    |
-| Planning service           | Goal-plan drafts/acceptance, revisions and stale checks; separate daily plans referencing persistent tasks in Phase 2.                                                  | Treating a model response as an accepted plan.                                      |
-| Scheduling logic           | Available intervals, reserved commitments, overlap/capacity checks, unscheduled work and shortfall calculations.                        | Inventing available time or silently changing priorities.                           |
-| Progress and forecasting   | Validated actual-work records; remaining-work and completion estimates with visible assumptions.                                        | Equating time spent with progress or accepting model-generated numerical forecasts. |
-| Trajectory/context service | Current interests, priorities, preferences, approved summaries, decisions, detours, source selection, correction/deletion coordination. | Silently promoting inferred preferences or storing all chats by default.            |
+| Work service               | Current persistent goals/checkpoints, standalone to-dos and validated edits; categorized courses/projects, resources and commitments are deferred.                           | Specialized course tooling or resource scraping.                                    |
+| Planning service           | Goal-plan drafts/acceptance, revisions and stale checks; current daily proposals referencing persistent to-dos and recorded progress.                                                  | Treating a model response as an accepted plan.                                      |
+| Scheduling logic (deferred) | Available intervals, reserved commitments, overlap checks and advanced shortfall calculations. Current allocation totals are validated without an interval engine.                        | Inventing available time or silently changing priorities.                           |
+| Progress; forecasting deferred | Current completion/progress records linked to persistent tasks; later remaining-work and completion estimates with visible assumptions.                                        | Equating time spent with progress or accepting model-generated numerical forecasts. |
+| Trajectory/context service (deferred) | Current interests, priorities, preferences, approved summaries, decisions, detours, source selection, correction/deletion coordination. | Silently promoting inferred preferences or storing all chats by default.            |
 | AI orchestration           | Bounded context assembly, prompt/output contracts, adapter calls, output validation, clarification and error results.                   | Direct persistence, arbitrary tools, or autonomous goal changes.                    |
 | Repositories               | Parameterized data access and mapping records to explicit return objects.                                                               | HTML rendering, prompt construction, or domain policy.                              |
 
-Possible route groups are work, plans, progress, and trajectory. Endpoint names and browser payloads are not final. Use explicit actions for requesting a draft, accepting a draft, confirming a trajectory change, and recording a detour; an ordinary read must not mutate commitments.
+Work, plans and progress are existing responsibility boundaries, not instructions to add route groups. Trajectory routes are deferred. Endpoint names and browser payloads are not final. Use explicit actions for requesting a draft, accepting a draft, confirming a trajectory change, and recording a detour; an ordinary read must not mutate commitments.
 
 ## D. Proposed Directory Structure
 
-Illustrative only: create none of these implementation files during setup. Names and grouping may change after stack and design approval. Package initializer files are omitted for readability.
+Retained cross-phase illustration only: create none of these files during this documentation adjustment. In particular, trajectory/context, interval scheduling and forecasting modules are deferred; the tree is not a current module checklist or the actual implemented layout. Prefer existing cohesive modules. Package initializer files are omitted for readability.
 
 ```text
 trajectory/                         # Project root
@@ -148,34 +150,38 @@ Routes call service interfaces; services use repositories and pure domain functi
 ```text
 Input -> route validation -> context snapshot -> AI extraction proposal
       -> schema + semantic checks -> user reviews/corrects missing details
-      -> explicit confirmation -> persist approved goal/trajectory details
+      -> explicit confirmation -> persist approved goal details
       -> AI task/milestone proposal -> semantic validation -> editable goal-plan draft
 ```
 
-Extraction and plan acceptance are separate approval boundaries. AI may propose new work details but must mark missing effort, deadlines, or priorities for clarification; it must not store guesses as facts. Existing tasks are referenced by validated identifiers. New task proposals cannot masquerade as existing records. The source snapshot includes record versions so later edits can be detected.
+Extraction and plan acceptance are separate approval boundaries. AI may propose new work details but must distinguish optional unknown effort/deadlines from essential missing goal information. Clarify only what prevents a useful proposal; never store guesses as facts. Existing tasks are referenced by validated identifiers. New task proposals cannot masquerade as existing records. The source snapshot includes record versions so later edits can be detected.
 
 ### 2. Edited plan to persisted acceptance
 
 ```text
 Edited draft + snapshot version -> route -> planning service
-    -> reload current work (and availability for Phase 2) -> validate applicable constraints
+    -> reload current work (and available time/progress for a daily proposal) -> validate applicable constraints
     -> if stale, explain and require review of updated draft
     -> if valid and explicitly accepted, atomic persistence -> accepted plan
 ```
 
 Validate again on acceptance, regardless of earlier browser checks. A rejected edit leaves the prior accepted plan intact. Repeated submission must not create duplicate acceptance records; use an acceptance identifier and transaction/version checks. Model invocation never holds a database write transaction open.
 
-### 3. Actual progress to persistent work and later forecasts
+### 3. Daily to-dos, progress and a fresh proposal
 
 ```text
-Progress/time entry -> validation -> progress service -> atomic save
-    -> read validated progress + remaining work + future capacity
-    -> forecasting function -> estimate, basis, and missing-data explanation
+Tomorrow's tasks + deadline choices + available time
+    -> validate and persist user-confirmed to-dos using stable identities
+    -> read current unfinished work, deadlines and recorded progress
+    -> bounded AI priority/allocation suggestions with brief reasons
+    -> validate references and allocation totals -> review/edit/approve
+Completion/progress entry -> validate -> persist against the same task
+Next planning request -> read current state -> fresh proposal
 ```
 
-Phase 1 saves completion/partial progress, blockers, actual time and optional accomplishment/learning notes against stable tasks and milestone context; detailed roll-up policy remains open. Phase 2 compares actuals to daily allocations and proposes next-day work using remaining capacity, missed work and changed deadlines. Reuse task identity, preserve historical plans/contributions and require approval of each new daily plan; no midnight progress reset or blind duplication. Estimates remain adjustable; actual evidence may inform revisions under reviewed rules.
+Standalone to-dos are valid; goal/milestone links are not prerequisites. Application validation owns allowed deadline options, usable available-time values, task identities/current state and allocation totals. The model cannot change deadlines, mark work complete or silently drop unallocated tasks. Completion records persist, unfinished tasks remain available, and new proposals do not reset progress or duplicate tasks.
 
-Record completed units separately from time spent. Forecasting below is Phase 2. Forecast in comparable approved workload units using observed completion rates and future usable capacity. If units are incompatible, history insufficient, or capacity unavailable, return an explicit unavailable/uncertain result rather than a made-up date. Formula, observation window, minimum history, and uncertainty display remain OPEN DECISION. Correcting actuals recalculates estimates. Forecast failure must not erase a successfully saved progress record.
+Deadline anchoring/day boundaries, overdue behavior, allocation units and plan retention/replacement remain open in Product.md/DECISIONS.md. This flow needs neither calendar time slots nor automatic milestone roll-up. Rich actual-time/quantity logs, adaptive estimates and evidence-based forecasting remain later work; time spent alone does not prove completion. No future forecast design is added here.
 
 ### 4. New learning activity to alignment review (Phase 3)
 
@@ -199,6 +205,8 @@ Allow later inspection, correction, or removal. A review date prompts a review; 
 
 ## F. AI and Application Logic Boundaries
 
+Current operations are goal/checkpoint proposals and daily priority/time-allocation proposals. The retained matrix also describes deferred scheduling, alignment and forecasting boundaries; those rows authorize no current implementation.
+
 | Model may propose                                                                  | Application must enforce                                                                                   |
 | ---------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------- |
 | Extracted goals, tasks, learning interests, and clarifying questions.              | Types, allowed fields, ownership, existing references, valid units/dates, and explicit confirmation.       |
@@ -214,9 +222,11 @@ Use a narrow adapter contract such as `generate(request, schema, timeout) -> res
 
 ## G. Persistent Context and Retrieval
 
+**Current:** Select only relevant saved goals/to-dos, deadline choices, available time and recorded progress using existing data access. No memory framework, retrieval service or full conversation archive is needed. The richer context lifecycle below is retained for the deferred navigator.
+
 Structured records are authoritative for current goals, tasks, availability, actual work, confirmed preferences, and detours. Approved summaries are derived, editable context with references to underlying decisions. Historical notes are optional supplementary evidence, never automatically current commitments.
 
-**Initial recommendation:** Select context by explicit goal/task relationships, current priority, active detour, and bounded relevant decision history using repository queries. Include source IDs, current version/status, and an inspectable explanation of selected records. Store only context that the product needs and the user has approved; do not default to full chat retention. Resource links do not imply automatic fetching or external-content ingestion.
+**Deferred navigator recommendation:** Select context by explicit goal/task relationships, current priority, active detour, and bounded relevant decision history using repository queries. Include source IDs, current version/status, and an inspectable explanation of selected records. Store only context that the product needs and the user has approved; do not default to full chat retention. Resource links do not imply automatic fetching or external-content ingestion.
 
 On conflicting records, use confirmed current state and ask about unresolved conflicts. Do not resolve changes of direction solely through an AI-generated summary. Natural-language advice cites relevant saved records where practical; a valid reference proves that the record exists, not that every model interpretation is correct. Retrieval and schema checks reduce some errors without guaranteeing truth.
 
@@ -228,7 +238,7 @@ On conflicting records, use confirmed current state and ask about unresolved con
 
 Services access repository methods rather than SQL. Repositories receive a connection/unit of work; the coordinating service defines the transaction for a complete action. Keep constraints and parameterized queries in persistence and domain rules in services/domain modules. Enable referential integrity and design uniqueness/version checks where needed.
 
-Database.md describes proposed schema, indexes, deletion relationships, migrations and progress units, distinguishing Phase 1 requirements from later-phase catalogues. Expected record groups are work/commitments, draft and accepted plans, actual work, trajectory preferences, confirmed decisions/detours, and approved summaries. These are conceptual responsibilities, not a final table list.
+Database.md describes proposed schema, indexes, deletion relationships, migrations and progress units, distinguishing Phase 1 requirements from later-phase catalogues. Current conceptual records are goals/checkpoint plans, persistent to-dos, daily proposals and completion/progress. Commitments, trajectory preferences, decisions/detours and approved summaries are later record groups; no table list or migration is chosen here. These are conceptual responsibilities, not a final table list.
 
 Use short transactions, explicit commit/rollback, and no inference calls inside transactions. Database contention must produce a recoverable error, not lost updates. Keep local database files outside static assets and source control. Do not place a SQLite file on shared network storage as an assumed scaling strategy. Server-database migration requires reviewed migrations and tests; a repository boundary does not make it automatic.
 
@@ -245,11 +255,11 @@ Use short transactions, explicit commit/rollback, and no inference calls inside 
 
 ## J. Testing and Observability
 
-Test scheduling and forecasting as pure functions with fixed time/capacity inputs. Cover overlaps, reserved intervals, impossible deadlines, insufficient history, zero capacity, distinct progress/time units, and timezone boundary cases after semantics are approved.
+For the current scope, verify both bounded planning flows, valid deadline options, available-time/allocation validation, completion records, unfinished-task continuity and restart persistence as specified in Testing.md. The remaining scheduling, forecasting and navigator checks in this section are deferred. Test later scheduling and forecasting as pure functions with fixed time/capacity inputs. Cover overlaps, reserved intervals, impossible deadlines, insufficient history, zero capacity, distinct progress/time units, and timezone boundary cases after semantics are approved.
 
 Service tests use fake repositories/adapters for approval rejection, invalid model fields, unknown references, invented preferences, detour review dates, timeout, stale drafts, and correction/deletion during an in-flight request. Repository integration tests use temporary databases for transaction rollback, restart persistence, version conflicts, duplicate acceptance prevention, and deletion effects.
 
-Verify all five Section E flows through routes and persistence. Check that browser edits are revalidated, previous plans survive failures, saved progress updates estimates, and confirmed detours influence subsequent context selection. Evaluate real-model quality separately from deterministic tests, using representative multi-interest and intentional-exploration cases. Fake inference tests do not prove that open-weight integration works.
+Verify Section E flows 1-3 for the current scope; flows 4-5 are deferred. Check that browser edits are revalidated, previous plans survive failures, saved progress informs fresh daily proposals. Estimate learning and detour context selection are later checks. Evaluate current goal/checkpoint and daily allocation usefulness separately from deterministic tests; multi-interest and intentional-exploration cases remain later navigator evaluation. Fake inference tests do not prove that open-weight integration works.
 
 Record request IDs, operation/failure category, duration, validation outcomes, context record counts, and model/runtime identifiers where appropriate. Avoid raw prompts, personal notes, full outputs, and secrets in ordinary logs. Inspect actual timings and failure rates without inventing metrics. Testing.md will define detailed checks and evidence; no tests or inference benchmarks were run during this documentation task.
 
@@ -273,13 +283,13 @@ Flask's [deployment guidance](https://flask.palletsprojects.com/en/stable/deploy
 
 | OPEN DECISION            | Recommendation / input needed before implementation                                                                                                                                           |
 | ------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Phase details            | Follow Product.md's confirmed four-phase allocation. Review milestone completion/roll-up, dependency and daily-plan policies before their dependent implementation.                                |
+| Current contracts        | Follow Product.md's two-feature boundary. Review minimal checkpoint/to-do/progress contracts and daily-plan lifecycle against existing storage. Automatic milestone roll-up and dependencies are deferred.                                |
 | Stack details            | Approved direction is Flask/Jinja/browser modules/Pydantic/SQLite/sqlite3/pytest; version/runtime evidence belongs to requirements.txt and Running.md. Any stack change needs separate approval.                                              |
 | Challenge constraints    | Supply official rules/link, deadline, required artifacts, and definition of eligible open-weight AI use. Compliance remains unverified.                                                       |
 | Time and budget          | Supply available build time, hosting/inference budget, and team familiarity. No delivery estimate can be validated yet.                                                                       |
 | Model/runtime review     | Existing Qwen3 4B/Ollama smoke evidence is in Running.md and Model_Verification.json. Broader quality, future model changes and hosted routes require separate evaluation/approval. |
 | Later hosting            | Local single-user Phase 1 is confirmed; hosted access/accounts require separate scope, security and deployment decisions.                                               |
-| Scheduling and forecasts | Approve timezone, recurrence/deadline semantics, planning horizon, progress units, forecast assumptions, minimum history, and uncertainty behavior.                                           |
+| Current time semantics   | Decide deadline anchor/day boundary/timezone, overdue handling and allocation units. Recurrence, interval placement and forecasting decisions are deferred.                                           |
 | Context policy           | Define important-change boundaries, detour review behavior, retained history, deletion completion/backup policy, and hosted data handling.                                                    |
 | Inference execution      | Start with bounded synchronous requests if measured latency permits. If not, revisit a minimal job/status mechanism and stale-result handling before adding a queue dependency.               |
 

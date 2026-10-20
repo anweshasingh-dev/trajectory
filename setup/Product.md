@@ -17,7 +17,7 @@ It aims to help people build realistic plans, record what actually happened, and
 
 ## 3. Confirmed requirements
 
-The product retains these capabilities across the four phases in Section 4; they are not all Phase 1 requirements.
+The product retains these capabilities as its long-term vision. Only the two features in Section 4 are in the current initial scope; this catalogue is not an initial-release checklist.
 
 | Capability | Required behavior |
 | --- | --- |
@@ -35,7 +35,7 @@ Do not claim completed features, performance, user validation, offline operation
 
 ### 3.1 Personal trajectory and persistent context
 
-**CONFIRMED REQUIREMENTS:** The navigator complements daily planning, progress tracking, overload detection, adaptive replanning, and data-grounded forecasts. Its navigator depth belongs to Phase 3; daily planning and forecasting belong to Phase 2.
+**DEFERRED VISION - not current scope:** The navigator complements daily planning, progress tracking, overload detection, adaptive replanning, and data-grounded forecasts. Its navigator depth belongs to Phase 3; advanced scheduling and forecasting remain later work. The simple Daily To-do Planner in Section 4 is current scope.
 
 The editable trajectory must represent long-term interests and goals; current learning priorities and commitments; courses, playlists, projects, and resources; relevant progress history and preferences; decisions and their reasons; and intentional detours or experiments with duration or review date where applicable.
 
@@ -53,16 +53,18 @@ Advice must use available records, identify supporting context where practical, 
 
 ## 4. Phased release scope
 
-**CONFIRMED SCOPE ALLOCATION:** Follow [Tasks.md](Tasks.md). This supersedes the earlier broad proposed MVP without removing its later capabilities.
+**CURRENT SCOPE - confirmed 2026-10-20:** Only two features are included. This supersedes the earlier allocation that placed all daily planning in Phase 2; the broader roadmap remains a deferred vision.
 
-1. **Phase 1 — Core MVP: Goal-to-Plan Assistant.** Capture a goal and clarify missing information; generate real, bounded open-weight task/milestone proposals; review, edit and explicitly approve; track task completion and actual work; persist and reopen goals, accepted plans and progress after restart. Include basic validation, correction/deletion and essential failure handling. An accepted goal work plan does not require a calendar date or daily time slots.
-2. **Phase 2 — Planning.** Organize competing goals, projects and commitments; build realistic daily schedules from availability, priorities, deadlines and dependencies; compare planned and actual work, detect overload, adapt plans and calculate evidence-based forecasts.
-3. **Phase 3 — Personal Career Navigator.** Connect planning to multiple interests, learning resources and longer-term ambitions using editable, user-confirmed context, decisions and intentional detours. Provide grounded guidance without forcing one career path.
-4. **Phase 4 — Advanced Capabilities.** Retain relevant historical-context retrieval, richer roadmap suggestions, exploration reviews and the Sketch Journal/artistic development module. Each extension needs separate scope approval.
+1. **Goal-to-Plan.** The user describes a big goal and what they want to achieve. AI proposes a structured plan with checkpoints or milestones. The user can review, edit and approve the proposal. Checkpoints structure the plan; automatic management of every milestone is deferred.
+2. **Daily To-do Planner.** The user enters tasks they want to work on tomorrow and provides their available time. Each to-do has exactly one deadline option: **2 days, 4 days, 1 week, or no deadline**. AI suggests priorities, reasonable time allocations and brief explanations using current to-dos, deadlines, available time and recorded progress.
 
-Phase 1 is a local, single-user app using the approved Python, Flask/Jinja, modular browser assets, SQLite/sqlite3, Pydantic and pytest direction. Daily calendar scheduling, automatic external calendar synchronization, hosted accounts and advanced career navigation are not Phase 1 requirements.
+To-dos persist between days. Completed tasks are recorded; unfinished tasks remain available for future planning. Every daily plan is a fresh, reviewable proposal using current inputs, not an automatic replay of yesterday's plan. Generating or declining a proposal must not erase saved to-dos or progress. A daily allocation does not require calendar time slots, a course record or a goal/milestone link.
 
-**Retained simplifications:** Categorize courses, projects and goals as work with actionable tasks; reserve recurring commitment time in Phase 2. Specialized course management, recurring-task automation, collaboration, external calendar synchronization and notifications need separate scope decisions.
+**Excluded now:** Calendar integration; importing all course schedules or deadlines; complex course management; automatic management of every milestone; advanced forecasting; autonomous agents; Sketch AI/Sketch Journal; and other advanced features. Basic validation of available time and suggested totals does not authorize a scheduling or forecasting engine.
+
+The existing later-phase vision is retained: **Phase 2** advanced scheduling, recurring commitments, overload analysis and evidence-based forecasting; **Phase 3** Personal Career Navigator; **Phase 4** separately selected advanced capabilities including historical retrieval, richer roadmaps and Sketch Journal. None is an initial-release dependency.
+
+The approved local single-user Python, Flask/Jinja, modular browser assets, SQLite/sqlite3, Pydantic and pytest direction is unchanged. This scope adjustment authorizes documentation only.
 
 ### 4.1 Phase 3 navigator slice
 
@@ -72,15 +74,17 @@ Use this profile and relevant existing work/progress records for planning and ac
 
 ### 4.2 Persistent work and daily contributions
 
-Goals, milestone checklists and unfinished master tasks persist across days. For example, maintaining an 8+ GPA, finishing JavaScript and Computer Networking playlists, building two substantial projects, completing research papers and developing white papers should connect to appropriate milestones and tasks rather than form a flat list.
+Persistent to-dos and completion/progress records are separate from each day's proposed allocations. Reuse existing task identities across days; a new day must not reset progress, duplicate unfinished tasks or discard completed-task records. Unfinished work remains available even when it receives no allocation in a particular plan.
 
-In Phase 2, the user can describe tomorrow's intentions in natural language. AI uses goals, milestones, deadlines, available hours and unfinished work to propose priorities, adjustable time estimates, a useful minimum work session and an explanation of each task's contribution. The user edits and approves. Application logic enforces deadlines, dependencies and available time, reporting conflicts instead of promising impossible work.
+Daily proposals use the current state, including recorded completion and unfinished work. Time spent alone does not establish completion. Deadline anchor, calendar-day interpretation, timezone, overdue handling, progress detail and daily-plan retention/replacement remain open in Section 7; the app must not silently renew a deadline each day.
 
-Record completion, partial progress, blockers, actual time and optional accomplishment/learning notes against persistent tasks. Recorded work informs task and milestone progress under reviewed update rules; time alone does not prove completion. Each day has its own plan and record of planned work; actual contributions and historical plans remain available. Next-day proposals account for missed work, changed deadlines, remaining capacity and actual progress, referencing existing tasks rather than blindly duplicating them. A new day creates a new plan, not a progress reset. Estimates stay editable and improve only where recorded evidence supports adjustment.
+Long-term links from goals to learning commitments, richer partial-work/blocker logs, milestone roll-up, minimum-session policies and evidence-based estimate adjustment remain retained ideas, not additional initial-release requirements.
 
 ## 5. Acceptance criteria by phase
 
-The four-phase allocation is confirmed; detailed fields, policies and algorithms remain subject to review. Phase 1 applies goal/task/milestone proposals, exact approval, task completion, actual-work recording, persistence, validation, correction/deletion and failures below. Daily scheduling, overload, forecasting and replanning apply in Phase 2; trajectory, alignment and detour checks apply in Phase 3.
+Current acceptance covers the two features in Section 4: a goal becomes a structured, editable proposal with checkpoints; tomorrow's to-dos accept only the four deadline options and available time; AI suggests priorities, allocations and brief reasons; completed records and unfinished tasks survive day changes and restart; a new proposal uses current progress. Suggestions exceeding available time must be flagged or revised rather than presented as fitting. Review/approval, validation, correction/deletion and failure handling apply to current records.
+
+The existing matrix below retains broader behavioral criteria for later releases. Only draft review, applicable input/capacity validation, recorded completion/progress, AI failure and persistence apply now. Career context, recurring commitments, time-slot constraints, adaptive milestone management, overload analysis and forecasts are deferred; detailed technical policies remain open.
 
 | Area | Observable acceptance criterion |
 | --- | --- |
@@ -90,11 +94,11 @@ The four-phase allocation is confirmed; detailed fields, policies and algorithms
 | Grounding and confirmation | Advice distinguishes saved information from interpretation and identifies supporting records where practical. A scenario with insufficient or conflicting context produces a clarifying question rather than an invented preference. Important goal or commitment changes are shown for confirmation and do not take effect if declined. |
 | Adaptive replanning | Changed priorities, progress, or confirmed detours can produce an editable revised plan. Existing constraint checks still apply, and accepting a new plan requires user action. Forecasts continue to use validated progress and remaining workload, not language-model completion predictions. |
 | Work organization | A user can create, view, edit, and remove work items; invalid deadlines, effort values, and required fields receive clear validation feedback. |
-| Availability | A user can enter available time and recurring commitments for the selected period; planning uses the resulting usable capacity. |
+| Availability | Current: enter available time for tomorrow. Deferred: recurring commitments and usable interval calculations. |
 | Draft planning | Given work and availability, the user can request a plan, inspect suggestions, edit them, and explicitly accept the result. Generating a draft does not silently replace an accepted plan. |
 | Constraint enforcement | Before acceptance, the application checks for overlapping planned work, conflicts with reserved commitments, and capacity overruns. Unresolved violations are shown and cannot be accepted as a valid schedule. |
 | Overload | If requested work cannot fit, the application identifies unscheduled work and the capacity shortfall instead of silently dropping work or promising that it will fit. |
-| Actual progress | A user can record and correct time spent and completed work, and compare planned work with actual records. Time spent alone does not imply an equal amount of completed work. |
+| Actual progress | Current: record completion/progress without losing unfinished tasks. Deferred: detailed time/quantity tracking and planned-versus-actual analysis. Time alone does not establish completion. |
 | Forecasting | An estimate uses recorded progress, remaining workload, and an explicit future-capacity assumption. The user can inspect its basis. Insufficient data produces an explanation rather than an invented completion date. |
 | AI failure | An unavailable model or invalid response produces a clear error or retry path while preserving saved work. Users can still inspect and edit their data and plans. |
 | Persistence | Saved work, accepted plans, and progress records survive an application restart through the approved persistence mechanism. |
@@ -105,6 +109,8 @@ Forecasts are estimates, not guarantees. Forecast assumptions, minimum data requ
 
 **PHASE 4 — Sketch Journal / artistic development:** Retain a dedicated digital illustration journal: organize dated sketches; record practice sessions, time and personal notes; link sketches to exercises, skills or artistic goals; and compare selected sketches across time for reflection. Eventually, a suitable vision model may offer feedback and practice suggestions on gesture, proportions, perspective and values. Distinguish visual observations from subjective judgments, communicate uncertainty and never claim objective measurement of artistic ability without evidence. This is a long-term practice module, not a generic attachment feature or a Phase 1 dependency. Architecture, media storage, privacy, model choice and evaluation remain explicitly open; no tables or integration design are specified here.
 
+**Other retained ideas, excluded now:** Calendar integration; bulk course schedule/deadline imports; specialized course management; automatic milestone management; advanced forecasting; and autonomous agents. These are deferred possibilities, not commitments or implementation designs.
+
 **FUTURE IDEAS / PROPOSED EXTENSIONS:** Rich retrieval across historical notes or selected conversation context; longer-term learning-roadmap suggestions grounded in the trajectory; and richer exploration reviews across multiple detours. Each requires separate scope approval. If historical retrieval is added, retrieved context must remain inspectable, correctable, and subject to deletion controls; retrieval must not convert historical or outdated statements into current commitments without confirmation.
 Other enhancements require a separate scope decision; their mention does not authorize implementation.
 
@@ -113,14 +119,15 @@ Other enhancements require a separate scope decision; their mention does not aut
 | Open decision | Input needed and consequence |
 | --- | --- |
 | Challenge eligibility | Obtain the official challenge name and rules/link, deadline, required artifacts, and AI usage criteria. Model eligibility and submission compliance cannot yet be claimed. |
-| Phase details | Four-phase allocation is confirmed; review detailed milestone/progress, dependency, minimum-session and acceptance policies before dependent implementation. |
+| Current contracts | Review the smallest goal-plan/checkpoint, persistent to-do and completion/progress representation against existing records. Automatic milestone roll-up, dependencies and minimum-session policies are deferred. |
 | Navigator details | Review Section 4.1's Phase 3 depth; historical retrieval, richer roadmaps and Sketch Journal remain Phase 4 until separately scoped. |
 | Trajectory review rules | Define which edits count as important goal or commitment changes, how current priorities supersede older decisions, and what the user sees when a detour reaches its review date. AI-proposed important changes always require confirmation. |
 | Memory and deletion boundaries | Define stored context categories, retention, deletion completion expectations, and treatment of derived summaries or copies. Corrected or deleted information must cease influencing advice once the change completes; no complete chat archive is assumed. |
 | Delivery constraints | Confirm development timeframe, budget, target platform, and available hardware or hosted inference access. These constrain feasible scope and architecture. |
 | User and hosting model | Local single-user Phase 1 is confirmed. Hosted/multi-user access needs separate scope, security and deployment decisions. |
-| Planning semantics | Decide planning horizon, time granularity, deadline interpretation, and how timezone and recurring commitments are handled. |
-| Progress and forecasting | Decide progress units, remaining-effort updates, minimum history, capacity assumptions, and how uncertainty is communicated. |
+| Deadline semantics | The four options are confirmed. Decide the duration anchor (entry or planning day), calendar-day versus elapsed-time interpretation, timezone/day boundary, due-time boundary, overdue behavior and explicit deadline edits. No automatic daily deadline reset. |
+| Daily-plan lifecycle | Decide proposal/history retention, replacement/acceptance rules, progress detail and available-time/allocation units. These do not require time-slot scheduling or recurring commitments. |
+| Deferred progress and forecasting | Rich units, remaining-effort updates, milestone roll-up, minimum history, capacity assumptions and uncertainty remain open for later scope, not current prerequisites. |
 | AI and stack | Python, Flask/Jinja, SQLite/sqlite3, Pydantic and pytest are approved. Running.md and Model_Verification.json record existing model/runtime evidence; challenge eligibility and broader quality require separate verification. |
 | Data handling | Determine what information is sent to inference services and how it is stored and retained before making privacy claims. |
 

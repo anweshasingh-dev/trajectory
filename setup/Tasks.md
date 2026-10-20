@@ -5,23 +5,23 @@
 
 ## 1. Direction and scope
 
-The user's latest roadmap request defines **Phase 1 as a Goal-to-Plan Assistant**: capture a goal, generate task/milestone proposals with an open-weight model, review/edit/approve, and record progress with restart persistence. The complete career navigator remains part of the long-term vision.
-
-Product.md now follows this four-phase allocation; DECISIONS.md records the approved stack/local-user direction. The current documentation alignment clarifies requirements but does not settle detailed milestone/progress, non-calendar plan or future daily-scheduling policies, authorize implementation or clear prerequisite gates.
+The explicit 2026-10-20 scope request limits the initial product to **Goal-to-Plan and the Daily To-do Planner** in Product.md Section 4. It supersedes the earlier goal-only initial boundary. This update changes documentation, not implementation authorization, prerequisite resolution, delivery promises or task statuses.
 
 ```mermaid
 flowchart LR
-    A[Phase 1: Core MVP\nGoal-to-Plan Assistant] --> B[Phase 2: Planning\nCapacity and forecasts]
-    B --> C[Phase 3: Personal Career Navigator\nDirection and context]
-    C --> D[Phase 4: Advanced Capabilities\nApproved future extensions]
+    A[Current: Goal-to-Plan and Daily To-do Planner] --> B[Deferred: advanced scheduling and forecasts]
+    B --> C[Deferred: Personal Career Navigator]
+    C --> D[Deferred: selected advanced capabilities]
 ```
 
-| Phase | Goal | Release boundary |
-| --- | --- | --- |
-| 1 · Core MVP | Turn a goal into approved, persistent work that can be tracked. | An ordered work plan, not yet a time-slot schedule or full career navigator. |
-| 2 · Planning | Fit work into real capacity and adjust using evidence. | Daily schedules, commitments, overload, planned-versus-actual and forecasts. |
-| 3 · Personal Career Navigator | Connect planning with an editable, multi-interest personal trajectory. | Confirmed context, alignment advice, decisions and intentional detours. |
-| 4 · Advanced Capabilities | Extend the full vision through separately approved increments. | Historical retrieval, richer roadmap support, Sketch Journal/artistic development and other explicitly selected future features. |
+| Existing task area | Current release boundary / deferred remainder |
+| --- | --- |
+| P1.01-P1.08 | Goal/checkpoint proposals, review/approval, persistent tasks and completion/progress; the initial loop also includes the current daily slice below. |
+| P2.02/P2.03/P2.06 | Only user-entered available time, daily priority/allocation proposals and fresh planning from current to-dos/progress move into the initial scope. Product.md owns their behavior; Database.md/AI_Integration.md own unresolved representations/contracts. |
+| Remaining Phase 2 detail | Course/commitment organization, time windows/slots, recurring commitments, dependency scheduling, advanced overload/comparison and forecasts remain deferred. Existing task IDs/dependencies describe that broader future package, not initial prerequisites. |
+| Phases 3-4 and backlog | Navigator, retrieval, roadmaps, Sketch AI/Journal, calendar integration, bulk course imports, complex course management, automatic milestone management and autonomous agents remain retained vision, not current work. |
+
+Do not renumber tasks, create duplicate daily-planning tasks or mark a broader Phase 2 task complete when only its current subset is delivered. Task splitting/status reconciliation requires separate authorization. Review current slice dependencies on their own; forecasts and recurrence are not prerequisites for simple daily proposals.
 
 The “eight weeks” in the example goal is user input to clarify, not a project delivery deadline or a guaranteed learning outcome. No calendar schedule or phase-duration promise is made here.
 
@@ -46,28 +46,28 @@ For later phases, retain the learning pace of a few hours per week. **Phase 1 ha
 
 ## 3. Phase 1 — Core MVP
 
-**Goal:** A usable Goal-to-Plan Assistant, before the full scheduling engine or personal navigator.
+**Goal:** The two-feature initial product in Product.md Section 4, before advanced scheduling, forecasting or the personal navigator.
 
-**Included:** Natural-language goal capture; missing-information questions; real open-weight task and milestone suggestions; editable drafts; exact user approval; task completion and actual-work records; reopening saved work after restart. Basic validation, correction/deletion, safe configuration and graceful failures apply from the first persisted/personal record.
+**Included:** Goal capture and structured checkpoint proposals; the current daily slice mapped above; editable proposals and user approval; persistent to-dos and completion/progress; reopening saved work after restart. Basic validation, correction/deletion, safe configuration and graceful failures apply from the first persisted/personal record.
 
-**Dependencies:** Approve the phase boundary and necessary contract/schema alignment; resolve the minimum stack, model/license/runtime, persistence, demo and interaction decisions. Design.md remains deferred until separately authorized; do not invent its visual direction here. Official challenge requirements must be checked before calling a demo challenge-ready.
+**Dependencies:** Approve the phase boundary and necessary contract/schema alignment; resolve the minimum stack, model/license/runtime, persistence, demo and interaction decisions. Design.md is protected in this adjustment; its existing content is not revised or implicitly approved here. Official challenge requirements must be checked before calling a demo challenge-ready.
 
 ### Required for Phase 1
 
 | ID | Task and included feature | Depends on | Completion criteria | Status |
 | --- | --- | --- | --- | --- |
-| P1.01 | Review the reduced first-release boundary and unresolved prerequisites in small decision sessions. | User input | Phase 1 scope, minimum interaction design, stack/storage, model selection evidence and demo boundary are explicitly approved. Necessary Product/Database/AI contract alignment is separately authorized and reviewed; milestone and non-calendar plan representation are settled without inventing fields here. | In Progress |
+| P1.01 | Review the reduced first-release boundary and unresolved prerequisites in small decision sessions. | User input | Phase 1 scope, minimum interaction design, stack/storage, model selection evidence and demo boundary are explicitly approved. Necessary Product/Database/AI contract alignment is separately authorized and reviewed; minimal checkpoint, to-do, daily-proposal and progress contracts plus deadline semantics are reviewed without inventing fields here. Advanced milestone management remains deferred. | In Progress |
 | P1.02 | Establish the smallest modular application and persistence slice. | P1.01 | Approved configuration starts successfully; a validated goal can be saved/reopened using the approved persistence mechanism; meaningful persistence/validation checks are recorded. No future-phase scaffolding is required. | Not Started |
-| P1.03 | Capture a goal and clarify missing information. | P1.02 | The user can enter a goal such as learning ML and building a portfolio project; ambiguous target dates and missing available hours are clarified. Stated values and unknowns remain distinct; no inferred details are silently saved as confirmed facts. | Not Started |
+| P1.03 | Capture a goal and clarify missing information. | P1.02 | The user can enter a goal such as learning ML and building a portfolio project; ambiguities that prevent a useful goal proposal are clarified. A goal proposal does not require a daily time budget or a deadline. Stated values and unknowns remain distinct; no inferred details are silently saved as confirmed facts. | Not Started |
 | P1.04 | Connect one verified eligible open-weight candidate through the isolated adapter. | P1.01–P1.03 | The exact artifact/license/runtime route has recorded evidence; a real bounded request returns a validated extraction/proposal or an actionable failure. Hardware/host behavior is actually checked, not assumed from documentation. | Not Started |
-| P1.05 | Generate an ordered draft with tasks and reviewable milestones. | P1.04 | Real model output proposes actionable work and milestone checkpoints under the approved contract. Missing effort/deadlines/hours produce clarification; invalid output or omitted required information is rejected or flagged. Milestones are proposals, not forecast guarantees. | Not Started |
+| P1.05 | Generate an ordered draft with tasks and reviewable milestones. | P1.04 | Real model output proposes actionable work and milestone checkpoints under the approved contract. Missing essential goal details produce clarification; effort/deadlines/hours may remain unknown when not needed. Invalid output or omitted required information is rejected or flagged. Milestones are proposals, not forecast guarantees. | Not Started |
 | P1.06 | Review, edit and approve the exact proposed plan. | P1.05 | Edits are revalidated; unapproved suggestions stay drafts; acceptance persists only the confirmed revision. Declining, stale input, duplicate acceptance and save failure do not overwrite prior accepted work. | Not Started |
-| P1.07 | Track and reopen actual work. | P1.06 | The user marks tasks complete, records/corrects completion, partial progress, blockers, actual time and optional accomplishment/learning notes against persistent task/milestone context, and reopens goal/plan/progress after restart. Milestone progress follows approved update rules, not elapsed time; unknown remaining work stays unknown; changes/removal follow approved dependent-record rules. | Not Started |
-| P1.08 | Verify the complete first-release loop and its failure paths. | P1.02–P1.07 | Recorded evidence covers goal -> real proposal -> edit/approve -> progress -> restart. Test malformed/unavailable inference, missing data, rejected approval, persistence failure and stale/duplicate acceptance. Document actual limitations and challenge evidence; no fake-adapter-only claim of real integration. | Not Started |
+| P1.07 | Track and reopen actual work. | P1.06 | The user records/corrects completion and relevant progress against persistent tasks, reopens goal/plan/progress after restart, and retains unfinished tasks for later planning. Time alone does not establish completion. Rich blocker/time/quantity logs and automatic milestone roll-up remain deferred; changes/removal follow reviewed dependent-record rules. | Not Started |
+| P1.08 | Verify the complete first-release loop and its failure paths. | P1.02–P1.07 | Recorded evidence covers goal -> real proposal -> edit/approve -> progress -> restart, plus the current daily-planning slice and its persistence/failure paths. Test malformed/unavailable inference, missing data, rejected approval, persistence failure and stale/duplicate acceptance. Document actual limitations and challenge evidence; no fake-adapter-only claim of real integration. | Not Started |
 
 ### P1.01 prerequisite review — started 2026-10-18
 
-This retains the original findings, questions and authorization gate as a historical review. Source-alignment notes below reflect this documentation update; later pinned versions, design work and local inference/approval evidence are recorded in requirements.txt, Design.md, Running.md and Part4_Report.md. Their existence does not by itself certify all prerequisites or change any task status.
+This retains the original findings, questions and authorization gate as a historical review. Its goal-only boundary, four-outcome budget advice, design deferral and Phase 2 daily allocation reflect 2026-10-18/19, not the current scope; Section 1 and DECISIONS.md C18 govern now. Historical statements of missing evidence are not claims about today's build. Source-alignment notes below reflect this documentation update; later pinned versions, design work and local inference/approval evidence are recorded in requirements.txt, Design.md, Running.md and Part4_Report.md. Their existence does not by itself certify all prerequisites or change any task status.
 
 **Review state:** In Progress. Only Tasks.md is being updated; implementation and other-document alignment remain unauthorized. The user explicitly approved the local single-user app and Python/Flask/Jinja/SQLite stack with Pydantic/pytest. Read-only hardware identification was completed; no model/license/runtime or inference performance is verified.
 
@@ -102,9 +102,11 @@ This retains the original findings, questions and authorization gate as a histor
 | --- | --- | --- | --- | --- |
 | P1.O1 | Add a few more synthetic examples and improve the explanations of milestones/clarification. | P1.08 | Approved cases show more understandable output without expanding contracts, adding screens/frameworks or weakening validation; record results honestly. | Not Started |
 
-**Phase 1 completion:** P1.01–P1.08 meet their criteria and the user reviews the end-to-end result. A real model meaningfully generates work suggestions; no plan is accepted without confirmation; saved records survive restart. Phase 2/3 features are not Phase 1 exit gates. If official challenge rules require more, report the conflict before labeling this scope submission-ready.
+**Initial release completion:** P1.01-P1.08 and the mapped current portions of P2.02/P2.03/P2.06 meet the two-feature acceptance boundary and the user reviews both loops. Real model suggestions, explicit review/approval and durable to-dos/completion/progress require evidence. Deferred Phase 2/3 features are not exit gates; this statement changes no status. If official challenge rules require more, report the conflict before labeling this scope submission-ready.
 
 ## 4. Phase 2 — Planning
+
+**Retained future package:** Only the simple daily subset identified in Section 1 is current. The full rows below retain the earlier advanced scope and dependencies; they are not instructions to build recurrence, forecasts or a course-management system now. Statuses are unchanged.
 
 **Goal:** Turn approved work into realistic daily schedules and evidence-based expectations.
 
@@ -197,7 +199,7 @@ These items were mentioned as possible enhancements/alternatives in the setup do
 
 ## 8. Gates before the next implementation step
 
-1. Review this phase allocation. It preserves the product vision while following the latest narrower first-release request; the current request authorizes documentation alignment only. Detailed contract/schema choices and implementation scopes still need their own review.
+1. Use Section 1's two-feature initial boundary and retained future packages. The 2026-10-20 request authorizes the seven named documents one file at a time, not implementation or task-status changes. Detailed contract/schema choices and implementation scopes still need their own review.
 2. Resolve only decisions needed for the next slice, referencing DECISIONS.md, preserving the already-approved Flask/SQLite/local-user direction and distinguishing recorded local model evidence from approval of future changes.
 3. Review the existing design/test documents and authorize any necessary refinements before dependent implementation; neither is changed implicitly by this roadmap. No final pages, components or interactions are specified here.
 4. Request a concrete small implementation scope. No task status changes to In Progress until that scope is authorized and work begins; Complete requires actual evidence, not an optimistic checkbox.

@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+{% block title %}{{ 'Correct work entry' if entry else 'Record work' }} - Trajectory{% endblock %}
+{% block content %}
+<div class="form-heading"><p class="eyebrow">{{ task.title }}</p><h1>{{ 'Correct work entry' if entry else 'Record work' }}</h1><p class="muted">Describe what happened on the selected day. Minutes alone never mark a task complete.</p></div>
+<form method="post" class="goal-form">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  <input type="hidden" name="revision" value="{{ revision }}">
+  <input type="hidden" name="request_id" value="{{ request_id }}">
+  {% if errors %}<div class="notice" role="alert"><strong>Unsaved - review your entry.</strong><p>{{ errors.get('form', 'Correct the fields below and save again.') }}</p></div>{% endif %}
+  <div class="field"><label for="work_date">Date of work</label>
+    <input id="work_date" name="work_date" type="date" required value="{{ values.get('work_date', '') }}" {% if errors.get('work_date') %}aria-invalid="true"{% endif %}>
+    {% if errors.get('work_date') %}<p class="field-error">{{ errors.work_date }}</p>{% endif %}
+  </div>
+  <div class="field"><label for="outcome">What changed?</label>
+    <select id="outcome" name="outcome" required>
+      <option value="partial" {% if values.get('outcome') == 'partial' %}selected{% endif %}>Partial progress</option>
+      <option value="completed" {% if values.get('outcome') == 'completed' %}selected{% endif %}>Task completed</option>
+      <option value="reopened" {% if values.get('outcome') == 'reopened' %}selected{% endif %}>Task reopened</option>
+    </select>
+    <p class="hint">A completion or reopening is an explicit update. Changing an older entry can change the task's current status.</p>
+    {% if errors.get('outcome') %}<p class="field-error">{{ errors.outcome }}</p>{% endif %}
+  </div>
+  <div class="field"><label for="actual_minutes">Actual minutes (optional)</label>
+    <input id="actual_minutes" name="actual_minutes" type="number" min="0" max="1440" step="1" value="{{ values.get('actual_minutes', '') if values.get('actual_minutes') is not none else '' }}" {% if errors.get('actual_minutes') %}aria-invalid="true"{% endif %}>
+    <p class="hint">Leave blank if unknown. Enter 0 when you know no time was spent.</p>
+    {% if errors.get('actual_minutes') %}<p class="field-error">{{ errors.actual_minutes }}</p>{% endif %}
+  </div>
+  <div class="field"><label for="notes">Progress or learning notes (optional)</label>
+    <textarea id="notes" name="notes" rows="4" maxlength="2000">{{ values.get('notes', '') }}</textarea>
+    {% if errors.get('notes') %}<p class="field-error">{{ errors.notes }}</p>{% endif %}
+  </div>
+  <div class="field"><label for="blocker_action">Blocker</label>
+    <select id="blocker_action" name="blocker_action">
+      <option value="none" {% if values.get('blocker_action') == 'none' %}selected{% endif %}>No blocker change</option>
+      <option value="raised" {% if values.get('blocker_action') == 'raised' %}selected{% endif %}>Record a blocker</option>
+      <option value="cleared" {% if values.get('blocker_action') == 'cleared' %}selected{% endif %}>Clear the current blocker</option>
+    </select>
+    {% if errors.get('blocker_action') %}<p class="field-error">{{ errors.blocker_action }}</p>{% endif %}
+  </div>
+  <div class="field"><label for="blocker_text">Blocker details (only when recording a blocker)</label>
+    <textarea id="blocker_text" name="blocker_text" rows="2" maxlength="1000">{{ values.get('blocker_text', '') }}</textarea>
+    {% if errors.get('blocker_text') %}<p class="field-error">{{ errors.blocker_text }}</p>{% endif %}
+  </div>
+  <div class="form-actions"><button type="submit">Save work entry</button><a href="{{ url_for('progress.detail', goal_id=goal_id, task_id=task.id) }}">Cancel</a></div>
+</form>
+{% endblock %}

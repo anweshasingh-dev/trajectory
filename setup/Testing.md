@@ -5,9 +5,9 @@
 
 ## 1. Test the current phase, preserve the full vision
 
-The approved roadmap makes Phase 1 a **Goal-to-Plan Assistant**: capture a goal, obtain real open-weight task/milestone suggestions, review/edit/approve, track actual work, and reopen saved records after restart. Phase 2 adds time-slot scheduling and forecasts; Phase 3 adds the persistent career navigator; Phase 4 tests only individually approved extensions.
+The current initial scope contains **Goal-to-Plan and the Daily To-do Planner** in Product.md Section 4. Verify both loops, persistent to-dos, recorded completion/progress and fresh daily proposals. Time-slot scheduling, bulk course imports/management, automatic milestone management, advanced forecasting, autonomous agents, Sketch AI/Journal and navigator features are deferred; their existing test ideas remain below.
 
-Product.md and the database/AI requirements now distinguish non-calendar goal plans from Phase 2 daily schedules. Exact milestone/progress, dependency and daily-plan policies still need review against current storage/contracts; this alignment does not settle them. Do not invent schema fields or final contracts to make a test pass. Specify the expected behavior here; mark dependent executable checks as Blocked when their missing contract actually prevents execution.
+Product.md distinguishes current goal/checkpoint and daily allocation proposals from deferred interval scheduling. Minimal storage/contracts, deadline semantics and plan lifecycle still need review; this alignment does not settle them. Do not invent schema fields or final contracts to make a test pass. Specify the expected behavior here; mark dependent executable checks as Blocked when their missing contract actually prevents execution.
 
 ```mermaid
 flowchart LR
@@ -38,7 +38,7 @@ pytest is the approved runner direction; requirements.txt records existing pinne
 - Use synthetic goals, preferences, notes and progress only. Never test migrations/deletion against a personal live database or send real personal context to an unapproved provider.
 - Use fixed clocks, explicit timezones, known capacities and finite quantities. Inject time and adapters rather than relying on the host date, mutable globals or a running model.
 - Test persisted behavior using a temporary on-disk database when restart durability matters; an in-memory database alone cannot prove it. Close/reopen the connection and restart the application against the same disposable file.
-- Use small reusable fixtures: a valid goal, an accepted plan, a pending proposal, two source versions, and actual-work entries. Add scheduling/navigator fixtures only with their phase. Do not prebuild future schema.
+- Use small reusable fixtures: a valid goal, an accepted plan, a pending proposal, two source versions, and actual-work entries. Add simple daily to-dos, recorded completion/progress and available-time fixtures when verifying the current daily slice; interval-scheduling/navigator fixtures remain deferred. Do not prebuild future schema.
 - Fake adapter outcomes must include valid, malformed, oversized/incomplete, timeout, unknown-reference and stale-result cases. Simulated errors are not evidence of measured real-runtime behavior.
 - Keep model evaluation cases and expected facts separately from prompt-tuning examples. Record exact runtime/model, prompt/schema version, generation settings and fixture/test version for reproducibility.
 
@@ -49,26 +49,31 @@ All checks below retain their planned **Not Run** status in this document. Runni
 | Test ID | Scenario | Observable pass condition | Roadmap task |
 | --- | --- | --- | --- |
 | T1.01 | Capture a natural-language goal with stated target and available hours. | Preserve stated details for review; validate required fields. Ambiguous relative dates are resolved using approved timezone/date rules and user confirmation, not an inferred server default. | P1.03 |
-| T1.02 | Omit available hours/deadline or provide contradictory information. | Ask focused clarification; missing values remain unknown. No guessed commitment becomes a saved fact. | P1.03/P1.05 |
+| T1.02 | Omit optional goal hours/deadline or provide contradictory essential goal information. | Optional values remain unknown without blocking a useful goal proposal; clarify essential ambiguities. No guessed commitment becomes a saved fact. | P1.03/P1.05 |
 | T1.03 | Generate task and milestone proposals with the real selected model. | A live call through the isolated adapter supplies actionable reviewable suggestions under the approved contract. A milestone is not a guaranteed completion date. Record exact model/runtime evidence. | P1.04/P1.05 |
 | T1.04 | Edit and decline a proposal. | Edits are revalidated; declined/unconfirmed suggestions do not become accepted work. Prior accepted work is unchanged. | P1.06 |
 | T1.05 | Approve the exact revised proposal. | Only the displayed confirmed revision is applied atomically; a repeated acceptance does not duplicate goals/tasks/plans. | P1.06 |
 | T1.06 | Change a source or edit from a second request before approval. | Stale versions are rejected with a review path; no lost update or acceptance of an unseen revision. | P1.06 |
 | T1.07 | Receive invalid JSON, extra fields, unknown targets, invalid quantities or incomplete/oversized output. | Reject the result before mutation; identify clarification/retry/manual options. No partial proposal application or generated-code execution. | P1.04–P1.06 |
 | T1.08 | Model unavailable or timed out. | Bound the wait by the approved limit; preserve data and allow manual editing/user-triggered retry. No automatic infinite repair loop or false success. | P1.04/P1.08 |
-| T1.09 | Mark a task complete and record/correct actual work. | Completion, completed quantity and time spent remain distinct. Persist corrections using approved rules; reject negative/non-finite values and empty actual-work entries. | P1.07 |
+| T1.09 | Mark a task complete and record/correct actual work. | Persist task completion and relevant progress/corrections under approved rules. Do not require invented time or quantity for completion-only records. Rich measurements are deferred; time alone never proves completion. | P1.07 |
 | T1.10 | Restart after saving a goal, accepted plan and actual work. | Reopen the same records and values from the disposable durable store, not cached browser/process state. | P1.02/P1.07 |
 | T1.11 | Correct/delete saved data through the approved dependent-record workflow. | Preview relevant consequences; preserve independently recorded actuals unless their deletion was explicitly selected. Removed content does not remain authoritative in proposals or derived copies. | P1.07 |
 | T1.12 | Fail persistence during acceptance or progress correction. | Roll back incomplete changes; preserve previous valid data. A successful save followed by a calculation/display failure is reported separately, not falsely as an unsaved or duplicated write. | P1.06–P1.08 |
-| T1.13 | Complete the first-release workflow with synthetic data. | Capture -> clarify -> real proposal -> edit -> approve -> record actual work -> restart -> reopen. User review finds usable feedback and no hidden automatic acceptance. | P1.08 |
+| T1.13 | Complete the first-release workflow with synthetic data. | Capture -> clarify as needed -> real goal/checkpoint proposal -> edit/approve -> record progress -> restart/reopen, plus the daily loop in T1.14-T1.18. User review finds usable feedback and no hidden automatic acceptance. | P1.08 |
+| T1.14 | Enter standalone tomorrow to-dos using each allowed deadline choice; submit an unsupported choice. | Accept only Product.md's four options; no goal/course/milestone link is required. Apply approved deadline semantics without silently choosing an anchor or due-time boundary. Unknown technical semantics block dependent execution, not documentation of the behavior. | P2.03 current slice |
+| T1.15 | Provide available time and request a real-model daily proposal; include more work than reasonably fits. | Show priorities, reasonable suggested allocations and brief reasons. Validate totals against available time; flag/revise excess and identify omitted/unallocated work. No calendar slots, course import, minimum-session policy or completion forecast is required. | P2.02/P2.03 current slice |
+| T1.16 | Complete one task, leave another unfinished, change the day and restart. | Completion/progress records survive; the same unfinished task remains available without duplication or reset. A new proposal does not erase recorded work or silently renew its deadline. | P1.07/P2.06 current slice |
+| T1.17 | Change to-dos, deadlines, available time or recorded progress before requesting another daily plan. | Build a fresh proposal from current state, not a blind replay. It reflects completed and unfinished work; all suggestions remain reviewable. Deadline changes follow the approved policy and user input. | P2.03/P2.06 current slice |
+| T1.18 | Edit/decline a daily proposal; change source data during generation/approval; simulate inference or save failure. | Revalidate the exact current revision, reject stale results and preserve to-dos/progress and prior saved work. Retention/replacement expectations use the approved lifecycle; no hidden acceptance or duplicate writes. | P1.06/P1.08/P2.06 current slice |
 
 **Phase 1 boundary:** Daily calendar placement, full overload/forecast algorithms, trajectory memory and advanced RAG are not Phase 1 exit requirements. Their tests remain visible below. Validation, approval, safe personal-data handling and persistence are required as soon as corresponding records exist.
 
-Additional Phase 1 acceptance coverage for P1.05/P1.07: reopen linked goals, milestone checklists, persistent tasks and accepted ordered plans without inventing a calendar date; record/correct completion, partial work, blockers, actual time and optional accomplishment/learning notes. Under the approved progress policy, contributions update relevant task/milestone state without equating elapsed time and completion or losing prior contributions on replacement. These are behavioral checks, not new schema decisions.
+Current P1.05/P1.07 coverage reopens goal checkpoints, persistent to-dos and recorded completion/progress without requiring calendar slots or automatic milestone roll-up. Retain richer partial-work/blocker/time/learning-note and milestone-update checks for a separately approved later slice. They are not current exit gates or new schema decisions.
 
 ## 5. Phase 2 — Planning and forecasting checks
 
-Status: **Not Run; later-phase scope.** Executable cases depend on approved time, recurrence, deadline, progress-unit and forecast policies. Do not silently choose those policies as test expectations.
+Status: **Not Run; retained advanced scope.** The current simple daily slice is covered by T1.14-T1.18. The full cases below remain deferred; executable advanced cases depend on approved time, recurrence, deadline, progress-unit and forecast policies. Do not silently choose those policies as test expectations.
 
 | Test ID | Scenario / fixed example | Observable pass condition | Roadmap task |
 | --- | --- | --- | --- |
@@ -83,7 +88,7 @@ Status: **Not Run; later-phase scope.** Executable cases depend on approved time
 | T2.09 | No history, zero future capacity, incompatible units or missing remaining work. | An explicit missing-data/unavailable or policy-defined uncertainty result, never an invented date or division error. | P2.05 |
 | T2.10 | Correct actuals/remaining workload or reduce future availability. | Recompute from corrected evidence; proposed replanning is editable and independently revalidated. No silent commitment changes. | P2.05/P2.06 |
 
-Additional Phase 2 checks (P2.03/P2.06), all **Not Run**:
+Retained advanced refinements for P2.03/P2.06, all **Not Run**; goal/milestone contribution analysis, minimum sessions, dependencies, rich logs and learned estimates are deferred:
 
 | Scenario | Observable pass condition |
 | --- | --- |
@@ -141,8 +146,8 @@ Follow AI_Integration.md Section 9 rather than duplicating its full rubric. Its 
 
 | Phase | Real-model evidence needed |
 | --- | --- |
-| 1 | Goal extraction, missing-information questions, task/milestone usefulness, valid contract behavior and actual bounded runtime performance. Include malformed-output handling through fake adapters separately. |
-| 2 | Useful ordering/allocation versus a simple deterministic baseline; constraints must remain contained by code even when model suggestions are poor. |
+| Current | Goal/checkpoint usefulness and daily priorities, allocations and brief reasons from current to-dos, deadline choices, available time and recorded progress; valid contract behavior and actual bounded runtime performance. Include malformed-output handling through fake adapters separately. |
+| Deferred 2 | Useful advanced interval scheduling/forecast-related suggestions versus a simple deterministic baseline; constraints must remain contained by code even when model suggestions are poor. |
 | 3 | Grounded alignment, respectful exploration questions, confirmed-detour use and no fabricated saved preferences. |
 | 4 | Approved extension-specific quality and failure cases, including retrieval semantics if selected. |
 
@@ -178,7 +183,7 @@ Keep result evidence only in an authorized report/location. This plan contains n
 
 A phase is ready for user review only when its required roadmap criteria and applicable tests have actual evidence, failures are resolved or explicitly accepted as scoped limitations, and the completion report identifies unrun/blocked checks. A critical violated constraint, unauthorized mutation or known use of deleted/stale context prevents calling the affected workflow verified; it cannot be hidden in an average score.
 
-- **Phase 1:** Real goal-to-plan generation, exact approval, actual-work tracking, restart durability and relevant failures are verified. No Phase 2/3 feature is silently made an exit gate.
+- **Current initial release:** Both real-model goal/checkpoint and daily to-do proposals, user review/approval, completion/progress recording, unfinished-task continuity, fresh planning, restart durability and relevant failures have evidence. Deferred interval scheduling, forecasts, navigator and automatic milestone management are not exit gates.
 - **Phase 2:** Required deterministic schedule/overload/forecast cases and revised-plan acceptance are verified against approved policies, with earlier regressions checked.
 - **Phase 3:** User-controlled context, grounded alignment, detours and deletion/in-flight invalidation are verified, preserving Phase 1/2 behavior.
 - **Phase 4:** Only the selected extension's approved criteria and affected regressions are gates; unselected vision/backlog stays visible without becoming mandatory.
@@ -187,9 +192,10 @@ Passing a limited test set is not proof of universal reliability, privacy, offli
 
 | OPEN DECISION | Required before dependent execution |
 | --- | --- |
-| Phase 1 contracts/schema | Requirements now distinguish persistent non-calendar goal plans; review exact milestone identity/checklist, contribution updates and task membership against current contracts/storage before dependent tests. |
+| Current contracts/storage | Review minimal goal/checkpoint, persistent to-do, daily-proposal and completion/progress contracts against existing records. No automatic milestone management or full catalogue is required. |
+| Current deadlines/lifecycle | Approve deadline anchor, calendar-day/elapsed interpretation, timezone/day and due-time boundaries, overdue behavior, allocation units and proposal retention/replacement before asserting exact executable expectations. |
 | Tools and interactions | pytest/stack direction is approved; review existing Design.md and authorize any needed interaction/test-tool refinements separately. Browser automation is optional until justified. |
-| Deterministic oracles | Approve timezone/recurrence/deadline semantics, scheduling policy, units, forecast formula, minimum evidence and rounding. |
+| Deferred deterministic oracles | Recurrence, interval scheduling, rich progress units and forecast formulas/evidence/rounding are later decisions, not current gates. |
 | Model/runtime and quality budgets | Verify exact candidate/license/runtime/hardware and approve timeout/context/output limits and practical quality/latency targets. |
 | Context and retention | Approve important-change boundaries, deletion/backup/provider policy and source invalidation details. |
 | Evaluation scope | Review AI_Integration.md's proposed dataset/repetition counts and phase-specific adaptation before candidate comparison. |

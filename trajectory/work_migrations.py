@@ -35,6 +35,15 @@ CREATE TABLE IF NOT EXISTS approved_plan_milestones (
 );
 """
 
+from .progress_storage import SCHEMA as PROGRESS_SCHEMA
+
+
+def migrate_progress(connection):
+    for statement in PROGRESS_SCHEMA.split(';'):
+        if statement.strip():
+            connection.execute(statement)
+    connection.execute('INSERT OR IGNORE INTO work_schema_migrations(version) VALUES (2)')
+
 
 def migrate():
     from . import work_storage
@@ -44,6 +53,7 @@ def migrate():
             if statement.strip():
                 connection.execute(statement)
         if connection.execute("SELECT 1 FROM work_schema_migrations WHERE version=1").fetchone():
+            migrate_progress(connection)
             return
         previous_by_goal = {}
         for row in connection.execute("SELECT * FROM approved_plans ORDER BY rowid").fetchall():
@@ -76,3 +86,4 @@ def migrate():
             )"""
         )
         connection.execute("INSERT INTO work_schema_migrations(version) VALUES (1)")
+        migrate_progress(connection)

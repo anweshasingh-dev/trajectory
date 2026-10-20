@@ -29,4 +29,6 @@ def create_app(test_config=None):
     app.register_blueprint(review_bp)
     from .work_routes import bp as work_bp
     app.register_blueprint(work_bp)
+    from .progress_routes import bp as progress_bp
+    app.register_blueprint(progress_bp)
     return app

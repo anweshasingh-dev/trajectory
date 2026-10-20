@@ -35,18 +35,18 @@ Any failed final check returns a review/error result rather than saving. Generat
 
 ## 2. MVP scope and deterministic boundaries
 
-Phase 1 means bounded goal clarification and task/milestone proposals for an ordered non-calendar goal plan, with review/edit/exact approval and persisted actual work. Phase 2 adds daily planning and forecasts; Phase 3 adds trajectory/alignment/context workflows. Phase 4 extensions remain separately scoped. The cross-phase responsibilities below do not make navigator or scheduling contracts Phase 1 dependencies.
+Current AI scope is limited to Goal-to-Plan and the simple Daily To-do Planner in Product.md Section 4. Both return structured, editable proposals for user review. Daily planning is current; calendar scheduling, bulk course schedule/deadline imports, complex course management, automatic milestone management, advanced forecasting, autonomous agents, Sketch AI and other advanced workflows are deferred. The cross-phase matrix below retains future boundaries without making them current contracts.
 
 | AI proposes | Application owns | User controls |
 | --- | --- | --- |
-| Goals, tasks, interests and clarification questions extracted from natural language. | Required fields, valid units/dates, record ownership and references. | Review/correction before extracted details become saved facts. |
-| Task ordering, suggested work amounts or breakdown, and reasons. | Available intervals, deterministic placement, overlap/deadline checks, capacity and unscheduled workload. | Edit and explicitly accept a plan. |
-| Possible priority mismatches and exploration questions. | Current confirmed priorities, active detours, source status/version checks. | Decide whether an activity is an intentional detour. |
-| Preference/decision summaries grounded in supplied context. | Confirmation, persistence, correction/deletion and invalidation. | Inspect and amend stored context; confirm important changes. |
+| Current: goals, actionable work/checkpoints and clarification questions. Interests/context extraction is deferred. | Required fields, valid units/dates, record ownership and references. | Review/correction before extracted details become saved facts. |
+| Current: priorities, suggested time allocations and brief reasons for tomorrow's to-dos. | Allowed deadline options, current task references/progress and allocation totals versus supplied available time. Interval placement is deferred. | Edit and explicitly accept a plan. |
+| Deferred: possible priority mismatches and exploration questions. | Current confirmed priorities, active detours, source status/version checks. | Decide whether an activity is an intentional detour. |
+| Deferred: preference/decision summaries grounded in supplied context. | Confirmation, persistence, correction/deletion and invalidation. | Inspect and amend stored context; confirm important changes. |
 
-**Phase 2 proposed scheduling refinement:** Ask AI for ordering and allocation suggestions, then let deterministic scheduling code place work in valid intervals. User-edited times are checked by the same code. The architecture permits editable schedule suggestions; this narrower contract avoids relying on model arithmetic. The placement/prioritization policy remains OPEN DECISION and must be approved before implementation. The model must never override a scheduling constraint.
+**Deferred Phase 2 scheduling proposal, not the simple daily planner:** Ask AI for ordering and allocation suggestions, then let deterministic scheduling code place work in valid intervals. User-edited times are checked by the same code. The architecture permits editable schedule suggestions; this narrower contract avoids relying on model arithmetic. The placement/prioritization policy remains OPEN DECISION and must be approved before implementation. The model must never override a scheduling constraint.
 
-Forecasting remains entirely application-owned: recorded completed work, remaining workload and approved future-capacity assumptions feed a testable calculation. Time spent is distinct from completed quantity. Incompatible units or insufficient evidence produce an unavailable/uncertain estimate. No model-generated completion date is accepted as a forecast. Phase 2 can show template-based forecast explanations without a model call; optional model paraphrasing may not change computed values.
+Advanced forecasting is deferred; its retained boundary remains entirely application-owned: recorded completed work, remaining workload and approved future-capacity assumptions feed a testable calculation. Time spent is distinct from completed quantity. Incompatible units or insufficient evidence produce an unavailable/uncertain estimate. No model-generated completion date is accepted as a forecast. Phase 2 can show template-based forecast explanations without a model call; optional model paraphrasing may not change computed values.
 
 **Future only:** Broad historical-note/conversation RAG, embedding/vector search, longer-term roadmap suggestions, richer exploration reviews, autonomous multi-step tools, and the Phase 4 Sketch Journal/artistic development module (Product.md Section 6). A suitable vision model may later support uncertain visual observations and practice suggestions; media privacy, model selection and evaluation are open, with no Phase 1 integration required. No agent framework is justified for the bounded workflows below.
 
@@ -84,24 +84,26 @@ Ollama documents schema-constrained responses in [structured outputs](https://do
 
 These are proposed logical contracts, not executable schemas or finalized route/database fields. Contract versions must be pinned with prompt/model settings during evaluation. Pydantic is the approved validation direction; this document authorizes no installation or code change.
 
-### Phase-specific contract boundary
+### Current and deferred contract boundaries
 
-**Phase 1:** A bounded proposal must distinguish goal facts from assumptions/questions and include reviewable milestone checkpoints/completion criteria and ordered actionable tasks, with effort suggestions adjustable or unknown. Draft-local keys are not persistent task IDs. Exact approval creates or links persistent work under reviewed identity/version rules. Current executable proposal bounds and approved-plan storage are documented in Running.md; the tables below retain logical proposals across later phases, not replacement schemas.
+**Current Goal-to-Plan:** A bounded proposal must distinguish goal facts from assumptions/questions and include reviewable milestone checkpoints/completion criteria and ordered actionable tasks, with effort suggestions adjustable or unknown. Draft-local keys are not persistent task IDs. Exact approval creates or links persistent work under reviewed identity/version rules. Current executable proposal bounds and approved-plan storage are documented in Running.md; the tables below retain logical proposals across later phases, not replacement schemas.
 
-**Phase 2 daily intentions:** Interpret tomorrow's natural-language intentions against existing goals, milestones, task IDs, unfinished work, deadlines, dependencies, available hours and relevant actual contributions/blockers. Propose priority/order, estimated time, a useful minimum work session and concise contribution reasons tied to goals/milestones. Flag unknowns and infeasible work for review. Estimates are suggestions, adjustable using recorded evidence under an approved policy; do not claim unsupported learned accuracy.
+**Current Daily To-do Planner:** Inputs are the user's tasks for tomorrow, one allowed deadline choice per task, available time and relevant recorded progress/current unfinished work. Product.md owns the four options and unresolved deadline semantics. No goal/milestone link, dependency graph, course schedule, recurring window or minimum-session field is required.
 
-Each daily plan is an editable proposal with explicit approval, separate from the persistent task list and actual-work history. Next-day proposals reference the same unfinished tasks, accounting for missed work, changed deadlines and remaining capacity; never reset progress or blindly clone tasks. Application logic validates dependency order, deadlines and available time and computes overload. Minimum-session definition, estimate adjustment and exact future contract fields remain OPEN DECISION.
+AI proposes priorities/order, reasonable time allocations and brief reasons. Use existing confirmed task identities once tasks are saved; new entries must not masquerade as existing tasks. Suggestions may leave work unallocated but must explain it without silently dropping a task. A proposal uses current completion/progress and must not mark work complete, alter deadlines or promise completion dates.
+
+Each daily plan is a fresh editable proposal, separate from persistent to-dos and recorded progress. Application validation checks allowed inputs, current references and allocation totals against supplied available time; it rechecks current data before acceptance. New days do not reset progress, duplicate unfinished tasks or automatically extend deadlines. Exact request/response fields, time units and retention/replacement policy remain open; no executable contract is selected here.
 
 ### 4.1 Backend request envelope
 
 | Field | Expected value and rule |
 | --- | --- |
-| `request_id`, `operation` | Application-issued identifier; operation allowlist: extraction, planning, alignment, context_summary. |
+| `request_id`, `operation` | Application-issued identifier. Current operations cover goal/checkpoint proposals and daily to-do planning; exact operation names remain under contract review. Alignment/context_summary are deferred. |
 | `contract_version`, `prompt_version` | Backend-controlled versions; never chosen by model output or browser input. |
 | `user_input` | Bounded text supplied for this action, treated as data within application policy. |
 | `context` | Selected confirmed records with typed IDs, versions, status and content needed for this operation. |
 | `source_revision` | Application-owned snapshot revision/version token; rechecked before showing or applying results. Not a value trusted from the model. |
-| `planning_inputs` | Only for planning: confirmed candidate task IDs and linked goals/milestones, requested/remaining effort, deadlines, dependencies, current priorities, unfinished work, relevant contributions/blockers and application-derived capacity information (Phase 2). |
+| `planning_inputs` | Current daily planning: saved candidate task identities/titles, deadline choices with application-confirmed meaning, available time and recorded progress/unfinished work. Goal/milestone links are optional. Dependencies, detours and interval capacity are deferred. Exact field names remain proposed. |
 | `response_schema` | Backend-selected schema for this operation. No generic executable action language. |
 | Runtime limits | Server-controlled timeout, input/context budget, output byte/token limits and generation settings; exact values remain OPEN DECISION. |
 
@@ -123,16 +125,16 @@ Reject unknown fields, invalid types, unbounded arrays/text, contradictory statu
 
 | Operation | Item fields | Meaning and checks |
 | --- | --- | --- |
-| Extraction | `proposal_key`, `kind`, `title`, optional `details`, `deadline_text`, `priority`, `effort_minutes`, `progress_unit`, `remaining_quantity`, `source_refs` | Allowlisted work/task/interest/preference proposals; missing values stay absent/NULL. Keys identify draft items, not database rows. Ambiguous dates or effort require clarification; do not invent defaults as confirmed facts. |
-| Daily planning (Phase 2) | `task_id`, `rank`, `suggested_minutes`, `reason`, `source_refs` | Existing confirmed tasks only; positive integer minutes, unique task IDs/ranks, no forecast dates or authoritative timestamps. Suggestions cannot exceed validated remaining effort without review. |
-| Alignment | `activity_key`, `assessment`, `possible_mismatch`, `question`, `source_refs` | Assessment: consistent / possible_mismatch / insufficient_context. No persistent distraction label. A mismatch asks whether exploration is intentional; insufficient evidence prompts clarification. |
-| Context summary/change | `proposal_key`, `kind`, optional `target_ref`, `proposed_text`, `reason`, optional `detour_scope`, `review_date_text`, `source_refs` | Propose inspectable preference/decision/detour/summary text; target must exist when modifying a record. Dates and exact changes need user review; important goal/commitment changes always require confirmation. |
+| Goal/work extraction (current); interest/preference fields deferred | `proposal_key`, `kind`, `title`, optional `details`, `deadline_text`, `priority`, `effort_minutes`, `progress_unit`, `remaining_quantity`, `source_refs` | Allowlisted work/task/interest/preference proposals; missing values stay absent/NULL. Keys identify draft items, not database rows. Ambiguous dates or effort require clarification; do not invent defaults as confirmed facts. |
+| Daily to-do planning (current; fields proposed) | `task_id`, `rank`, `suggested_minutes`, `reason`, `source_refs` | Existing confirmed tasks only; positive integer minutes, unique task IDs/ranks, no forecast dates or authoritative timestamps. Validate totals against available time; known remaining effort is optional, not a required user input. |
+| Alignment (deferred) | `activity_key`, `assessment`, `possible_mismatch`, `question`, `source_refs` | Assessment: consistent / possible_mismatch / insufficient_context. No persistent distraction label. A mismatch asks whether exploration is intentional; insufficient evidence prompts clarification. |
+| Context summary/change (deferred) | `proposal_key`, `kind`, optional `target_ref`, `proposed_text`, `reason`, optional `detour_scope`, `review_date_text`, `source_refs` | Propose inspectable preference/decision/detour/summary text; target must exist when modifying a record. Dates and exact changes need user review; important goal/commitment changes always require confirmation. |
 
 A natural-language detour request is interpreted into a proposal, not treated as approval of unseen extracted details. New task breakdowns go through extraction/confirmation before they become planning task IDs. Keep goal/commitment mutations inside validated application workflows; no model-generated SQL, arbitrary patch paths, code or direct writes.
 
-**Planning completeness rule:** The application retains the full submitted candidate set. If the model omits a task, report it as omitted/unallocated or ask for review; do not silently lose it. Derive scheduled minutes, unscheduled workload and capacity shortfall in code. Explicitly distinguish work not requested for today from work requested today that could not fit.
+**Planning completeness rule:** The application retains the full submitted candidate set. If the model omits a task, report it as omitted/unallocated or ask for review; do not silently lose it. Validate suggested totals and report omitted/unallocated tasks in code; interval placement and advanced shortfall analysis are deferred. Explicitly distinguish work not requested for today from work requested today that could not fit.
 
-### 4.4 Small illustrative exchange
+### 4.4 Retained deferred navigator example
 
 ```text
 User: Keep learning ML, but explore quantum computing on weekends for a month.
@@ -149,8 +151,8 @@ This is an invented example of intended behavior, not a test result or a finaliz
 
 | Prompt | Required instructions | Must not do |
 | --- | --- | --- |
-| Extraction | Separate stated details from missing/ambiguous values; preserve multiple interests; ask focused questions. | Invent effort, deadlines, preferences or confirmed commitments. |
-| Planning | Use current confirmed priorities and detours; propose ordering/allocation with reasons; account for supplied constraints. | Claim a schedule is valid, override hard constraints, or guarantee completion. |
+| Goal/work extraction | Separate stated details from missing/ambiguous values; preserve multiple interests; ask focused questions. | Invent effort, deadlines, preferences or confirmed commitments. |
+| Daily planning | Use supplied to-dos, deadline choices, available time and recorded progress; suggest priorities/allocations with brief reasons. Detour context and interval scheduling are deferred. | Claim a schedule is valid, override hard constraints, or guarantee completion. |
 | Alignment | Compare with cited current records; explain uncertainty; respectfully ask about intentional exploration. | Shame the user, assume unfamiliar topics are distractions, or change priorities. |
 | Context summary | Summarize only supplied evidence, retaining decision reasons and detour scope; label unresolved conflicts. | Turn historical statements or interpretations into current facts without confirmation. |
 
@@ -159,6 +161,8 @@ This is an invented example of intended behavior, not a test result or a finaliz
 Use compact task-specific examples only when evaluation shows they help. Keep prompts versioned with contracts in the proposed AI module; do not create those files now. Prefer low-variability settings as a test candidate, but do not call low temperature deterministic or assume a seed gives identical outputs on every runtime/device.
 
 ## 6. Context retrieval and persistent memory
+
+**Current:** Select bounded goal/to-do records and relevant completion/progress through existing data access. The richer context diagram and memory lifecycle below are retained for the deferred navigator; no context service, RAG, embeddings or full chat archive is required now.
 
 ```mermaid
 flowchart LR
@@ -189,7 +193,7 @@ Structured records define current facts; approved summaries are derived context;
 | 2. Structure | Parse JSON and validate the operation's schema/types/enums/limits. | Reject malformed/extra/unsupported fields; no partial application. |
 | 3. References | Check supplied task/source/target IDs, ownership, status and versions. | Reject unknown/stale/deleted references; regenerate or clarify. |
 | 4. Meaning | Check dates, quantities, existing versus new tasks, facts versus interpretations, and detour/change semantics. | Ask about missing/contradictory information; unsupported claims stay unverified. |
-| 5. Domain | In Phase 2, enforce deadlines/dependencies and compute placements/overlaps/capacity and forecast values in deterministic modules. | Show violations and unscheduled work; never present a violating schedule as valid. |
+| 5. Domain | Current: validate deadline choices under the approved semantics, task state, positive allocations and totals versus supplied available time. Deferred: dependencies, interval placement/overlap and forecasts. | Flag/reject invalid allocations; retain omitted/unallocated work and prior saved state. |
 | 6. User review | Present exact editable proposal with relevant sources and before/after values for important changes. | Declined/unconfirmed changes do not become facts. |
 | 7. Commit | Re-read current versions, revalidate edits/constraints, atomically persist and prevent duplicate acceptance. | Rollback or review prompt; preserve the prior accepted plan. |
 
@@ -229,7 +233,9 @@ No new evaluation, benchmark, real-model call, hardware check or license verific
 
 ### 9.2 Proposed starter dataset
 
-Use 20 reviewed synthetic cases: four per group below. Include valid examples and failures; retain expected facts, missing fields, relevant source IDs, allowed proposal behavior and forbidden mutations for each. This size is a starting recommendation, not a statistical reliability claim. Use a separate small development set for prompt tuning; do not silently tune on the final comparison cases.
+Current evaluation needs both goal/checkpoint usefulness and daily priorities, allocations and reasons across allowed deadline options, limited time, recorded completion and unfinished work. Select a small approved current-scope subset/adaptation; do not require navigator or advanced scheduling cases now or silently change the proposed counts.
+
+Retain the cross-phase proposal of 20 reviewed synthetic cases: four per group below. Include valid examples and failures; retain expected facts, missing fields, relevant source IDs, allowed proposal behavior and forbidden mutations for each. This size is a starting recommendation, not a statistical reliability claim. Use a separate small development set for prompt tuning; do not silently tune on the final comparison cases.
 
 | Case group | Include | Expected evidence |
 | --- | --- | --- |
@@ -263,10 +269,10 @@ Keep exact model revision/digest, license source, runtime/device configuration, 
 | Challenge eligibility | Official challenge rules/link, deadline and submission evidence requirements. |
 | Candidate replacement / broader evaluation | Existing Qwen3 4B/Ollama evidence is referenced above, without making a new selection. Approve phase-relevant quality budgets and any new model/hosted route separately. |
 | Later runtime/deployment | Local single-user Phase 1 is confirmed; hosted processing, new endpoints and public access need separate decisions. |
-| Planning contracts | Review milestone/progress and non-calendar plan semantics against current Phase 1 contracts; separately settle Phase 2 minimum-session/estimate outputs, dependencies and placement policy. |
+| Current planning contracts | Review minimal goal/checkpoint and daily to-do/progress inputs/outputs against existing contracts. Resolve deadline semantics, allocation units and plan retention/replacement without selecting a schema here. Minimum sessions, dependencies and interval placement are deferred. |
 | Budgets and quality gates | Context/output limits, timeout, response-time target and minimum useful extraction/alignment quality. |
 | Context and confirmation | Important-change boundaries, detour review behavior, proposal expiry, correction/deletion and retention requirements. |
-| Forecast inputs | Units, minimum history, future-capacity assumptions and formula remain application decisions; the model cannot settle them. |
+| Deferred forecast inputs | Units, minimum history, future-capacity assumptions and formula remain application decisions; the model cannot settle them. |
 
 Related documents: Product.md defines behavior; Architecture.md defines component boundaries. Database.md is a separate schema proposal, not assumed approved by this integration document. Testing.md and submission.md hold verification/submission requirements. Running.md describes current implementation; this document does not modify those records.
 

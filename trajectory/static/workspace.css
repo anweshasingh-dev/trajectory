@@ -78,3 +78,7 @@ footer { max-width:1200px; margin:auto; padding:24px 32px; color:var(--muted); f
 
 /* Work forms share the existing input appearance. */
 select { font:inherit; width:100%; min-height:44px; padding:10px 12px; border:1px solid var(--control); border-radius:8px; background:var(--surface); color:var(--ink); }
+.work-entry { border-top:1px solid var(--line); padding:20px 0; }
+.work-entry h3 { font-size:1.05rem; margin:0 0 8px; }
+.work-entry details { max-width:38rem; }
+.work-entry summary { cursor:pointer; padding:8px 0; }
