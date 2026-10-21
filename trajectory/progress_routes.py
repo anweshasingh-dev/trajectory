@@ -2,11 +2,18 @@
 import sqlite3
 from datetime import date
 from uuid import uuid4
-from flask import Blueprint, abort, redirect, render_template, request, url_for
+from flask import Blueprint, abort, current_app, redirect, render_template, request, url_for
 from pydantic import ValidationError
 from . import progress_service, progress_storage, work_storage
 
 bp = Blueprint("progress", __name__)
+
+
+@bp.before_request
+def hide_legacy_progress():
+    """Keep legacy handlers and data available without exposing them in the MVP."""
+    if not current_app.config["LEGACY_PROGRESS_UI"]:
+        abort(404)
 
 
 def selected_task(goal_id, task_id):

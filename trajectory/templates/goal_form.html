@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% block title %}{{ 'Edit goal' if goal else 'New goal' }} - Trajectory{% endblock %}
 {% block content %}
-<div class="form-heading"><p class="eyebrow">Goal context</p><h1>{{ 'Refine your goal.' if goal else 'Start with an ambition.' }}</h1><p class="muted">Answer what you can. For each optional detail, enter a value or explicitly choose its alternative. You can save unfinished answers.</p></div>
+<div class="form-heading"><p class="eyebrow">Goal context</p><h1>{{ 'Refine your goal.' if goal else 'Start with an ambition.' }}</h1><p class="muted">A title and goal description are enough to start. Leave optional details blank and add them later; no acknowledgement is required.</p></div>
 <form class="goal-form" method="post" data-goal-form>
   <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
   <input type="hidden" name="revision" value="{{ values.get('revision', 0) }}">

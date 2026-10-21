@@ -12,6 +12,7 @@ def create_app(test_config=None):
         DATABASE=str(Path(app.instance_path) / "trajectory.sqlite"),
         OLLAMA_MODEL="qwen3:4b",
         INFERENCE_TIMEOUT=120,
+        LEGACY_PROGRESS_UI=False,
         MAX_CONTENT_LENGTH=64 * 1024,
         SESSION_COOKIE_HTTPONLY=True,
         SESSION_COOKIE_SAMESITE="Lax",
@@ -31,4 +32,6 @@ def create_app(test_config=None):
     app.register_blueprint(work_bp)
     from .progress_routes import bp as progress_bp
     app.register_blueprint(progress_bp)
+    from .task_routes import bp as task_master_bp
+    app.register_blueprint(task_master_bp)
     return app

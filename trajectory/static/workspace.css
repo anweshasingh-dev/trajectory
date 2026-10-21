@@ -82,3 +82,15 @@ select { font:inherit; width:100%; min-height:44px; padding:10px 12px; border:1p
 .work-entry h3 { font-size:1.05rem; margin:0 0 8px; }
 .work-entry details { max-width:38rem; }
 .work-entry summary { cursor:pointer; padding:8px 0; }
+
+/* Navigation and standalone Task Master reuse the workspace tokens and forms. */
+.site-nav { display:flex; flex-wrap:wrap; gap:8px; }
+.site-nav a { display:inline-flex; align-items:center; min-height:44px; padding:8px 12px; border-radius:8px; text-decoration:none; }
+.site-nav a:hover { background:#efefeb; }
+.site-nav a[aria-current="page"] { background:var(--ink); color:var(--surface); font-weight:600; }
+.task-list { padding:28px; background:var(--surface); border:1px solid var(--line); border-radius:12px; }
+.task-list>h2 { display:flex; justify-content:space-between; gap:16px; }
+.task-list h3 { overflow-wrap:anywhere; }
+.task-empty { padding:24px 0; }
+.task-empty h3 { margin-top:0; }
+@media(max-width:768px) { .site-header { flex-wrap:wrap; gap:12px; } .site-nav { order:3; flex-basis:100%; } .task-list { padding:20px; } }

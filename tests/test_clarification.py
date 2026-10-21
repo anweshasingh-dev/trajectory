@@ -6,13 +6,14 @@ from trajectory import create_app
 from test_goals import app, submit
 
 
-def test_unanswered_goal_shows_questions(app):
+def test_unanswered_goal_shows_optional_suggestions_without_blocking_generation(app):
     client = app.test_client()
     created = submit(client, description="Finish in eight weeks")
     page = client.get(created.location)
-    assert b"A few details to clarify" in page.data
+    assert b"Optional details you can add" in page.data
     assert b"specific target date" in page.data
-    assert b"Context ready" not in page.data
+    assert b"Generate proposal" in page.data
+    assert b"add these details later" in page.data
 
 
 def test_explicit_unknowns_survive_restart(app):
@@ -71,4 +72,4 @@ def test_existing_database_receives_additive_schema(app):
     page = restarted.get(created.location)
     assert page.status_code == 200
     assert b"Learn ML" in page.data
-    assert b"A few details to clarify" in page.data
+    assert b"Optional details you can add" in page.data

@@ -8,7 +8,14 @@
 </head>
 <body>
   <a class="skip-link" href="#main">Skip to content</a>
-  <header class="site-header"><a class="brand" href="{{ url_for('goals.index') }}">Trajectory<span> / a little direction, every day</span></a><span class="local-label">Local workspace</span></header>
+  <header class="site-header">
+    <a class="brand" href="{{ url_for('goals.index') }}">Trajectory<span> / a little direction, every day</span></a>
+    <nav class="site-nav" aria-label="Main navigation">
+      <a href="{{ url_for('goals.index') }}" {% if request.blueprint != 'task_master' %}aria-current="page"{% endif %}>Goal Planner</a>
+      <a href="{{ url_for('task_master.index') }}" {% if request.blueprint == 'task_master' %}aria-current="page"{% endif %}>Task Master</a>
+    </nav>
+    <span class="local-label">Local workspace</span>
+  </header>
   <main id="main" tabindex="-1">{% block content %}{% endblock %}</main>
   <footer>Start with a goal. Make room for the work.</footer>
 </body>

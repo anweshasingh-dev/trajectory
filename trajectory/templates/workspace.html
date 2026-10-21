@@ -13,18 +13,18 @@
     <dl class="goal-details">
     <div><dt>Desired outcome</dt><dd>{{ goal.desired_outcome or ('Not sure yet' if goal.outcome_unknown else 'Not specified yet') }}</dd></div>
     <div><dt>Starting point</dt><dd>{{ goal.starting_point or ('Not sure yet' if goal.starting_point_unknown else 'Not specified yet') }}</dd></div>
-    <div><dt>Available time</dt><dd>{% if goal.weekly_hours is not none %}{{ '%g'|format(goal.weekly_hours) }} hours / week{% elif goal.hours_unknown %}Unknown - acknowledged{% else %}Unknown{% endif %}</dd></div>
+    <div><dt>Available time</dt><dd>{% if goal.weekly_hours is not none %}{{ '%g'|format(goal.weekly_hours) }} hours / week{% else %}Unknown{% endif %}</dd></div>
     <div><dt>Target date</dt><dd>{{ goal.target_date or ('No fixed deadline' if goal.no_deadline else 'Not specified') }}</dd></div>
     </dl>
     <section class="clarification" aria-labelledby="clarification-heading">
       {% if questions %}
-      <h3 id="clarification-heading">A few details to clarify</h3>
-      <p class="muted">These details help shape a useful proposal. Relative dates in your description are not treated as confirmed deadlines; enter an exact date or choose no fixed deadline.</p>
+      <h3 id="clarification-heading">Optional details you can add</h3>
+      <p class="muted">You can generate a plan now and add these details later. Blank details stay unknown. Relative dates in your description are not saved as confirmed deadlines.</p>
       <ul>{% for item in questions %}<li>{{ item.question }}</li>{% endfor %}</ul>
-      <a class="button" href="{{ url_for('goals.edit', goal_id=goal.id) }}">Clarify goal</a>
+      <a class="text-link" href="{{ url_for('goals.edit', goal_id=goal.id) }}">Add optional context</a>
       {% else %}
       <h3 id="clarification-heading">Context ready for a proposal</h3>
-      <p class="muted">Each detail has an answer or an explicit unknown. Unknowns remain unknown; they will not become invented facts.</p>
+      <p class="muted">Review the generated suggestions before approval. Unknown details remain unknown and will not become saved facts.</p>
       {% endif %}
     </section>
     <a class="button secondary" href="{{ url_for('goals.edit', goal_id=goal.id) }}">Edit goal</a>

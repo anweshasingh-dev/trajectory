@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% block title %}Delete task - Task Master{% endblock %}
+{% block content %}
+<div class="form-heading"><p class="eyebrow">Task Master</p><h1>Delete this task?</h1></div>
+<form method="post" class="goal-form">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  <input type="hidden" name="revision" value="{{ revision }}">
+  {% if error %}<div class="notice" role="alert">{{ error }}</div>{% endif %}
+  {% if task %}
+  <h2>{{ task.title }}</h2>
+  {% if task.description %}<p class="preserve">{{ task.description }}</p>{% endif %}
+  <p class="muted">Status: {{ 'Done' if task.status == 'done' else 'Undone' }}</p>
+  {% include '_task_deadline.html' %}
+  <p>This permanently deletes the task and its notes. It cannot be undone.</p>
+  {% if conflict %}
+  <a class="button secondary" href="{{ url_for('task_master.delete', task_id=task.id) }}">Review latest task</a>
+  {% else %}
+  <div class="field"><label class="choice"><input type="checkbox" name="confirmed" required> I confirm permanent deletion of this task.</label></div>
+  {% endif %}
+  {% endif %}
+  <div class="form-actions">
+    {% if task and not conflict %}<button type="submit">Permanently delete task</button>{% endif %}
+    <a href="{{ url_for('task_master.index') }}">Cancel</a>
+  </div>
+</form>
+{% endblock %}

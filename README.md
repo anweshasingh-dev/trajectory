@@ -2,7 +2,7 @@
 
 **Turn ambition into a plan you can follow—and revise.**
 
-> **Core MVP in progress:** Goal capture, local AI draft generation, review and approval, persistent milestones/tasks, and dated actual-work tracking are implemented. Two real-model generation checks are recorded separately. Daily planning remains to be built. Status updated October 19, 2026.
+> **Core MVP in progress:** Goal capture with optional context, local AI draft generation, editing/review/approval, saving and goal-linked milestone/task editing are implemented. Legacy progress tracking is hidden with code/data preserved. Standalone task creation, editing, confirmed deletion and restart persistence are implemented. Saved done/undone controls and creation-based deadlines are implemented in Part 2. Daily AI planning remains pending. Status updated October 21, 2026.
 
 ## Overview
 
@@ -12,20 +12,20 @@ Trajectory is a personal goal-to-action and progress system for students, indepe
 
 A goal such as “Learn machine learning and finish a portfolio project in eight weeks” leaves practical questions: What should I do first? What fits my available time? How do I keep the plan useful after things change?
 
-Trajectory aims to turn that description into proposed tasks and milestones, ask about missing information, and let the user edit and approve the work before tracking progress. Later phases add capacity-aware scheduling and evidence-based completion estimates. A target entered by the user is not a guaranteed outcome.
+Trajectory aims to turn that description into proposed tasks and milestones, offer optional follow-up questions, and let the user edit and approve the work without requiring availability or target dates. Later phases add capacity-aware scheduling and evidence-based completion estimates. A target entered by the user is not a guaranteed outcome.
 
 ## Key features
 
-**Implemented:** Create/edit/reopen goals, clarification, validated local AI drafts, review/approval, persistent milestone/task editing, dated work entries, partial progress, completion, blockers, corrections and reopening. **Pending:** Daily planning and complete end-to-end MVP verification. The table below describes the earlier phase boundaries.
+**Implemented:** Create/edit/reopen goals, genuinely optional context, validated local AI drafts, editing/review/approval, saving, goal-linked milestone/task editing and standalone Task Master create/edit/delete, done/undone controls and deadlines. **Preserved but hidden:** Legacy dated progress/work logs and summaries. **Pending MVP:** Task Master daily availability and reviewed daily AI planning. The table distinguishes this MVP scope from deferred work.
 
 | Scope | Planned capabilities |
 | --- | --- |
-| Phase 1 MVP | Natural-language goal capture; open-weight task/milestone proposals and clarification; explicit review/edit/approval; task completion and actual-work records; persistence across restarts. |
-| Phase 2 Planning | Natural-language daily intentions; prioritized editable schedules linked to persistent goals, milestones and tasks; recurring commitments, overload, planned-versus-actual, evidence-based forecasts and next-day replanning. |
+| Phase 1 MVP | Goal Planner with optional context, structured proposals, edit/review/approval and persistence. Task Master standalone to-do management is implemented. Done/undone controls and creation-based local-calendar-day deadlines are implemented. Daily availability and reviewed AI allocations remain pending. |
+| Phase 2 Planning | Advanced scheduling, recurring commitments, overload, planned-versus-actual analysis, evidence-based forecasts and adaptive replanning. |
 | Phase 3 Personal Career Navigator | Multiple career interests, editable persistent preferences/decisions, relevant learning resources, alignment advice and intentional detours. |
 | Phase 4 future possibilities | Historical-note retrieval/RAG, richer learning roadmaps, exploration reviews and the dedicated Sketch Journal/artistic development module. Each needs separate scope approval. |
 
-Goals, milestone checklists and master tasks persist. Dated work entries record explicit completion, partial work, blockers, actual minutes and optional notes; corrections recalculate task status and milestone completion counts. Future daily plans will reference these same tasks and work records.
+Goals, milestone checklists and goal-linked tasks persist. Legacy dated work entries, actual minutes, blockers and completion summaries remain stored with their code intact, but hidden from the current UI. Task Master manages ordinary to-dos independently of goals or milestones, with title, optional notes, editing, confirmed permanent deletion and restart persistence. Done/undone status and the four deadline choices are implemented. Daily-plan continuity is still planned.
 
 The future Sketch Journal preserves dated sketches, practice/time/notes, exercise/skill/goal links and comparisons across time, with eventual vision-assisted feedback and practice suggestions that communicate uncertainty. Its architecture, storage, privacy and model choices remain open; see [the full artistic vision](setup/Product.md#6-future-scope).
 
@@ -53,9 +53,9 @@ Possible monetization includes a one-time local-app purchase or paid convenience
 
 ## Current development status
 
-The first working slices support goal capture, correction, explicit unknown/no-deadline clarification, local structured proposal generation and SQLite restart persistence. Invalid responses are rejected, changed goal context invalidates generation, and failed attempts preserve earlier saved drafts. Plan review/edit/approval is implemented with immutable approved snapshots and retained task identities. Direct task/milestone editing and dated actual-work records are implemented with correction, removal and restart persistence.
+The current Goal Planner supports goal capture with blank optional context, local structured proposals, editing/review/approval and SQLite restart persistence. Invalid responses are rejected, changed context invalidates drafts, and failures preserve earlier saved work. Approved snapshots retain task identities; direct goal-linked task/milestone editing remains available. Legacy progress UI/routes are hidden by default with code/data preserved. Task Master Parts 1 and 2 are implemented at `/tasks`; daily AI planning remains pending. Choose 2 days, 4 days, 1 week or no deadline. Dates count from the saved local creation day, through the end of the due date; only an explicit deadline edit changes the choice.
 
-Automated tests cover goal persistence, clarification, draft/review lifecycle, task identity, dated progress, corrections, migrations and inference failure paths. These use fake adapters for repeatability; a live model smoke check is separate and does not establish broad plan quality. Setup documents distinguish phased requirements from technical proposals; Tasks.md retains its earlier tracking snapshot without certifying completion; [Running.md](setup/Running.md) describes the implemented slice.
+All 191 automated regression tests pass, including 53 Part 2 cases for calendar deadlines, status changes, restart persistence, conflicts and migration rollback. The Task Master subset passes all 92 cases; desktop and 390px browser creation/edit/completion checks also pass. Existing Goal Planner and legacy progress regressions remain covered. Fake-adapter tests are separate from two synthetic local-model stabilization checks; neither establishes broad model quality. [Tasks.md](setup/Tasks.md) distinguishes implemented, pending and deferred work; [Running.md](setup/Running.md) records verification and limitations.
 
 ## Technology stack
 

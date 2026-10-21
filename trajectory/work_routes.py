@@ -1,6 +1,6 @@
 """Direct milestone/task forms; shared CSRF protection applies to every POST."""
 import sqlite3
-from flask import Blueprint, abort, redirect, render_template, request, url_for
+from flask import Blueprint, abort, current_app, redirect, render_template, request, url_for
 from pydantic import ValidationError
 from . import storage, work_storage, work_service, progress_storage, progress_service
 
@@ -14,10 +14,13 @@ def index(goal_id):
         abort(404)
     milestones = work_storage.milestones(goal_id)
     tasks = work_storage.tasks(goal_id)
-    summaries, counts = progress_service.summaries_for_goal(goal_id, tasks, milestones)
+    summaries, counts, archived = {}, {}, []
+    if current_app.config["LEGACY_PROGRESS_UI"]:
+        summaries, counts = progress_service.summaries_for_goal(goal_id, tasks, milestones)
+        archived = progress_storage.archived_tasks(goal_id)
     return render_template(
         "work.html", goal=goal, milestones=milestones, tasks=tasks,
-        summaries=summaries, counts=counts, archived=progress_storage.archived_tasks(goal_id),
+        summaries=summaries, counts=counts, archived=archived,
         saved=request.args.get("saved") == "1"
     )
 

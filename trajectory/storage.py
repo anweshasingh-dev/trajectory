@@ -47,6 +47,8 @@ def initialize():
     get_db().executescript(SCHEMA + DRAFT_SCHEMA + REVIEW_SCHEMA)
     from .work_migrations import migrate
     migrate()
+    from .task_storage import migrate as migrate_tasks
+    migrate_tasks()
 
 
 def list_goals():

@@ -52,12 +52,32 @@ def test_draft_is_saved_reopened_and_duplicate_request_is_idempotent(app):
         assert connection.execute("SELECT count(*) FROM plan_drafts").fetchone()[0] == 1
 
 
-def test_incomplete_context_never_calls_model(app):
+@pytest.mark.parametrize("optional", [
+    {},
+    {"weekly_hours": "", "target_date": ""},
+    {"desired_outcome": "Publish a demo", "starting_point": "Know Python"},
+    {"weekly_hours": "3", "target_date": "2026-12-01"},
+])
+def test_optional_context_does_not_block_generation_or_invent_goal_facts(app, optional):
     client = app.test_client()
-    goal_url = submit(client).location.split("?")[0]
-    with patch("trajectory.ai.OllamaAdapter.generate") as adapter:
-        assert generate(client, goal_url).status_code == 409
-        adapter.assert_not_called()
+    goal_url = submit(client, **optional).location.split("?")[0]
+    goal_id = goal_url.rsplit("/", 1)[1]
+    with app.app_context():
+        before = storage.find_goal(goal_id)
+    with patch("trajectory.ai.OllamaAdapter.generate", return_value=fake_result()) as adapter:
+        assert generate(client, goal_url).status_code == 303
+        context = adapter.call_args.args[0]
+    assert context["weekly_hours"] == before["weekly_hours"]
+    assert context["target_date"] == before["target_date"]
+    assert context["desired_outcome"] == before["desired_outcome"]
+    assert context["starting_point"] == before["starting_point"]
+    assert not any(context[flag] for flag in (
+        "outcome_unknown", "starting_point_unknown", "hours_unknown", "no_deadline"))
+    with app.app_context():
+        assert storage.find_goal(goal_id) == before
+    page = create_app(dict(app.config)).test_client().get(goal_url)
+    assert b"Inspect the data" in page.data
+    assert b"Draft saved locally" in page.data
 
 
 def test_goal_change_during_generation_discards_response(app):

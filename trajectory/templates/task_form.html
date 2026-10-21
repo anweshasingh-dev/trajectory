@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+{% block title %}{{ 'Edit' if task_id else 'New' }} task - Task Master{% endblock %}
+{% block content %}
+<div class="form-heading">
+  <p class="eyebrow">Task Master</p><h1>{{ 'Edit' if task_id else 'New' }} task</h1>
+  <p class="muted">Give your task a title and add any details you want to keep.</p>
+</div>
+<form method="post" class="goal-form">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  {% if task_id %}<input type="hidden" name="revision" value="{{ revision }}">{% endif %}
+  {% if errors %}
+  <div class="notice" role="alert">
+    <strong>Unsaved: review your entries.</strong>
+    <p>{{ errors.get('form', 'Correct the fields indicated below.') }}</p>
+    {% if conflict %}<a href="{{ url_for('task_master.index') }}" target="_blank" rel="noopener">Review saved tasks in another tab</a>{% endif %}
+  </div>
+  {% endif %}
+  <div class="field">
+    <label for="title">Task title</label>
+    <input id="title" name="title" maxlength="160" required value="{{ values.get('title', '') }}" {% if errors.get('title') %}aria-invalid="true" aria-describedby="title-error"{% endif %}>
+    {% if errors.get('title') %}<p class="field-error" id="title-error">{{ errors.title }}</p>{% endif %}
+  </div>
+  <div class="field">
+    <label for="description">Notes (optional)</label>
+    <textarea id="description" name="description" rows="4" maxlength="1200" {% if errors.get('description') %}aria-invalid="true" aria-describedby="description-error"{% endif %}>{{ values.get('description', '') }}</textarea>
+    {% if errors.get('description') %}<p class="field-error" id="description-error">{{ errors.description }}</p>{% endif %}
+  </div>
+  <div class="field">
+    <label for="deadline">Deadline</label>
+    <p class="hint" id="deadline-hint">Counted in local calendar days from the task's creation day, through the end of the due date. Changing this choice still uses the original creation day.</p>
+    {% if task %}
+    <p class="muted">Created <time datetime="{{ task.created_on }}">{{ task.created_on }}</time></p>
+    {% include '_task_deadline.html' %}
+    {% endif %}
+    <select id="deadline" name="deadline" aria-describedby="deadline-hint{% if errors.get('deadline') %} deadline-error{% endif %}" {% if errors.get('deadline') %}aria-invalid="true"{% endif %}>
+      {% for value, label in deadline_choices %}
+      <option value="{{ value }}" {% if values.get('deadline', 'none') == value %}selected{% endif %}>{{ label }}</option>
+      {% endfor %}
+    </select>
+    {% if errors.get('deadline') %}<p class="field-error" id="deadline-error">{{ errors.deadline }}</p>{% endif %}
+  </div>
+  <div class="form-actions">
+    {% if not conflict %}<button type="submit">Save task</button>{% endif %}
+    <a href="{{ url_for('task_master.index') }}">Cancel</a>
+  </div>
+</form>
+{% endblock %}

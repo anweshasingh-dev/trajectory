@@ -1,0 +1,5 @@
+<p class="muted">
+  {% if task.due_on %}
+  Due <time datetime="{{ task.due_on }}">{{ task.due_on }}</time>{% if task.overdue %} · <strong>Overdue</strong>{% elif task.due_today %} · <strong>Due today</strong>{% endif %}
+  {% else %}No deadline{% endif %}
+</p>

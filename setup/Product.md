@@ -35,7 +35,7 @@ Do not claim completed features, performance, user validation, offline operation
 
 ### 3.1 Personal trajectory and persistent context
 
-**DEFERRED VISION - not current scope:** The navigator complements daily planning, progress tracking, overload detection, adaptive replanning, and data-grounded forecasts. Its navigator depth belongs to Phase 3; advanced scheduling and forecasting remain later work. The simple Daily To-do Planner in Section 4 is current scope.
+**DEFERRED VISION - not current scope:** The navigator complements daily planning, progress tracking, overload detection, adaptive replanning, and data-grounded forecasts. Its navigator depth belongs to Phase 3; advanced scheduling and forecasting remain later work. Task Master's simple daily planner in Section 4 is planned MVP work.
 
 The editable trajectory must represent long-term interests and goals; current learning priorities and commitments; courses, playlists, projects, and resources; relevant progress history and preferences; decisions and their reasons; and intentional detours or experiments with duration or review date where applicable.
 
@@ -55,10 +55,12 @@ Advice must use available records, identify supporting context where practical, 
 
 **CURRENT SCOPE - confirmed 2026-10-20:** Only two features are included. This supersedes the earlier allocation that placed all daily planning in Phase 2; the broader roadmap remains a deferred vision.
 
-1. **Goal-to-Plan.** The user describes a big goal and what they want to achieve. AI proposes a structured plan with checkpoints or milestones. The user can review, edit and approve the proposal. Checkpoints structure the plan; automatic management of every milestone is deferred.
-2. **Daily To-do Planner.** The user enters tasks they want to work on tomorrow and provides their available time. Each to-do has exactly one deadline option: **2 days, 4 days, 1 week, or no deadline**. AI suggests priorities, reasonable time allocations and brief explanations using current to-dos, deadlines, available time and recorded progress.
+1. **Goal Planner.** The user describes a goal and what they want to achieve. AI proposes a structured plan with checkpoints or milestones. **Implemented:** goal capture, structured plan generation, editing, review, explicit approval and saving; preserve these workflows. Optional context is genuinely optional. Missing optional details, including weekly availability or a target date, must not block a useful plan or require explicit acknowledgement of unknowns. Unknowns remain unknown; suggestions must not become saved facts without confirmation. Checkpoints structure the plan; automatic management of every milestone is deferred.
+2. **Task Master — Parts 1 and 2 implemented October 21, 2026; daily planning remains planned.** A separate page for ordinary to-dos, with no required goal or milestone link. Create, view, edit and confirm permanent deletion using a title and optional notes; saved tasks reopen after restart. Simple saved done/undone controls are implemented, without progress analytics. Its planned daily planner lets the user enter tasks for tomorrow and provide daily available time. The deadline control offers exactly one of: **2 days, 4 days, 1 week, or no deadline**, measured in local calendar days from the day the task is added. After the user has entered their tasks, AI will consider every unfinished task and suggest priorities, reasonable time allocations and brief explanations using deadlines, available time and done/undone status, for user review before acceptance.
 
-To-dos persist between days. Completed tasks are recorded; unfinished tasks remain available for future planning. Every daily plan is a fresh, reviewable proposal using current inputs, not an automatic replay of yesterday's plan. Generating or declining a proposal must not erase saved to-dos or progress. A daily allocation does not require calendar time slots, a course record or a goal/milestone link.
+**Planned Task Master continuity:** To-dos and their done/undone status must persist between days and restarts; unfinished tasks remain available for future planning. Every daily plan must be a fresh, reviewable proposal using current inputs. Generating or declining a proposal must not erase saved to-dos or their status. A daily allocation does not require calendar time slots, a course record or a goal/milestone link.
+
+**Legacy progress — hidden from the MVP UI:** Progress-entry controls, detailed work logs, history and summaries are hidden by default; bookmarked legacy progress routes are unavailable in this mode. Existing code and stored data are preserved behind a server-controlled legacy UI switch. These legacy capabilities are not current MVP features. Progress analytics and detailed progress tracking remain excluded from the current user experience.
 
 **Excluded now:** Calendar integration; importing all course schedules or deadlines; complex course management; automatic management of every milestone; advanced forecasting; autonomous agents; Sketch AI/Sketch Journal; and other advanced features. Basic validation of available time and suggested totals does not authorize a scheduling or forecasting engine.
 
@@ -74,17 +76,24 @@ Use this profile and relevant existing work/progress records for planning and ac
 
 ### 4.2 Persistent work and daily contributions
 
-Persistent to-dos and completion/progress records are separate from each day's proposed allocations. Reuse existing task identities across days; a new day must not reset progress, duplicate unfinished tasks or discard completed-task records. Unfinished work remains available even when it receives no allocation in a particular plan.
+**PLANNED MVP WORK:** Persistent Task Master to-dos and their done/undone status must be separate from each day's proposed allocations. Reuse task identities across days; a new day must not reset status, duplicate unfinished tasks or discard completed tasks. Unfinished work remains available even when it receives no allocation in a particular plan.
 
-Daily proposals use the current state, including recorded completion and unfinished work. Time spent alone does not establish completion. Deadline anchor, calendar-day interpretation, timezone, overdue handling, progress detail and daily-plan retention/replacement remain open in Section 7; the app must not silently renew a deadline each day.
+Planned daily proposals use current done/undone status and unfinished work. Time spent alone does not establish completion. Deadlines use local calendar days starting on the day the task is added, as confirmed October 21, 2026. Part 2 uses the computer's local calendar, saves the creation day and treats the due date as inclusive; unfinished tasks become overdue the next day. Explicit deadline changes keep the original creation-day anchor. Daily-plan retention/replacement remains open in Section 7. The app must not silently renew a deadline each day.
 
 Long-term links from goals to learning commitments, richer partial-work/blocker logs, milestone roll-up, minimum-session policies and evidence-based estimate adjustment remain retained ideas, not additional initial-release requirements.
 
 ## 5. Acceptance criteria by phase
 
-Current acceptance covers the two features in Section 4: a goal becomes a structured, editable proposal with checkpoints; tomorrow's to-dos accept only the four deadline options and available time; AI suggests priorities, allocations and brief reasons; completed records and unfinished tasks survive day changes and restart; a new proposal uses current progress. Suggestions exceeding available time must be flagged or revised rather than presented as fitting. Review/approval, validation, correction/deletion and failure handling apply to current records.
+Acceptance for the approved MVP scope distinguishes existing functionality from work still to be delivered:
 
-The existing matrix below retains broader behavioral criteria for later releases. Only draft review, applicable input/capacity validation, recorded completion/progress, AI failure and persistence apply now. Career context, recurring commitments, time-slot constraints, adaptive milestone management, overload analysis and forecasts are deferred; detailed technical policies remain open.
+- **Goal Planner — preserve implemented functionality:** A goal becomes a structured, editable proposal with checkpoints that the user can review, explicitly approve and save. Saved goals and plans survive restart; generating or declining a draft preserves the approved plan.
+- **Goal Planner — implemented optional context:** A user can generate a useful plan while optional context is blank, including weekly availability and target date, without acknowledging unknowns. Missing context must not become invented saved facts.
+- **Task Master — partial implementation:** Ordinary to-dos can be created, viewed, edited and permanently deleted after confirmation on a separate page, without a goal or milestone. Task persistence, done/undone controls and creation-based deadlines are implemented, without progress analytics. The remaining planned daily planner will accept daily available time and only the four deadline options, measured in local calendar days; AI will propose priorities, allocations and brief reasons for user review and explicit acceptance. Suggestions exceeding available time must be flagged or revised rather than presented as fitting. To-dos and status survive day changes and restart, and fresh proposals use current inputs without losing unfinished work.
+- **Legacy progress — implemented UI boundary:** Progress-tracking controls, history and summaries are hidden by default; existing code and stored data remain preserved. Hidden legacy functionality is not presented as an MVP feature.
+
+Review/approval, applicable validation and AI failure handling apply to existing goal-plan workflows and the planned daily planner. Correction/deletion requirements remain applicable to their respective records; this does not claim all such controls are implemented.
+
+The existing matrix below retains broader behavioral criteria for later releases. Draft review, applicable input validation, AI failure and goal/plan persistence apply to existing workflows. Daily availability and allocation validation are planned MVP work. Persistent done/undone status is implemented. Career context, recurring commitments, time-slot constraints, adaptive milestone management, detailed progress tracking, progress analytics, overload analysis and forecasts are deferred; detailed technical policies remain open.
 
 | Area | Observable acceptance criterion |
 | --- | --- |
@@ -94,14 +103,14 @@ The existing matrix below retains broader behavioral criteria for later releases
 | Grounding and confirmation | Advice distinguishes saved information from interpretation and identifies supporting records where practical. A scenario with insufficient or conflicting context produces a clarifying question rather than an invented preference. Important goal or commitment changes are shown for confirmation and do not take effect if declined. |
 | Adaptive replanning | Changed priorities, progress, or confirmed detours can produce an editable revised plan. Existing constraint checks still apply, and accepting a new plan requires user action. Forecasts continue to use validated progress and remaining workload, not language-model completion predictions. |
 | Work organization | A user can create, view, edit, and remove work items; invalid deadlines, effort values, and required fields receive clear validation feedback. |
-| Availability | Current: enter available time for tomorrow. Deferred: recurring commitments and usable interval calculations. |
-| Draft planning | Given work and availability, the user can request a plan, inspect suggestions, edit them, and explicitly accept the result. Generating a draft does not silently replace an accepted plan. |
+| Availability | Planned MVP work: enter daily available time for tomorrow's Task Master proposal. Goal Planner weekly availability remains optional. Deferred: recurring commitments and usable interval calculations. |
+| Draft planning | Implemented Goal Planner: request, inspect, edit, explicitly approve and save a structured plan. Blank optional context does not block generation. Planned Task Master: review, edit and explicitly accept a daily proposal using to-dos and daily availability. Generating a draft does not silently replace an accepted plan. |
 | Constraint enforcement | Before acceptance, the application checks for overlapping planned work, conflicts with reserved commitments, and capacity overruns. Unresolved violations are shown and cannot be accepted as a valid schedule. |
 | Overload | If requested work cannot fit, the application identifies unscheduled work and the capacity shortfall instead of silently dropping work or promising that it will fit. |
-| Actual progress | Current: record completion/progress without losing unfinished tasks. Deferred: detailed time/quantity tracking and planned-versus-actual analysis. Time alone does not establish completion. |
+| Actual progress | Deferred: detailed time/quantity tracking, work history and planned-versus-actual analysis. Existing legacy code and data are preserved, with progress features hidden by default from the current experience. Task Master uses only done/undone status. Time alone does not establish completion. |
 | Forecasting | An estimate uses recorded progress, remaining workload, and an explicit future-capacity assumption. The user can inspect its basis. Insufficient data produces an explanation rather than an invented completion date. |
 | AI failure | An unavailable model or invalid response produces a clear error or retry path while preserving saved work. Users can still inspect and edit their data and plans. |
-| Persistence | Saved work, accepted plans, and progress records survive an application restart through the approved persistence mechanism. |
+| Persistence | Implemented: saved goals, approved plans and standalone Task Master to-dos survive restart. Implemented: done/undone controls and deadlines. Planned MVP work: accepted daily-plan persistence. Preserve legacy progress data; it is excluded from the current experience. |
 
 Forecasts are estimates, not guarantees. Forecast assumptions, minimum data requirements, and deadline-risk rules remain open until architecture and testing review.
 
@@ -119,14 +128,14 @@ Other enhancements require a separate scope decision; their mention does not aut
 | Open decision | Input needed and consequence |
 | --- | --- |
 | Challenge eligibility | Obtain the official challenge name and rules/link, deadline, required artifacts, and AI usage criteria. Model eligibility and submission compliance cannot yet be claimed. |
-| Current contracts | Review the smallest goal-plan/checkpoint, persistent to-do and completion/progress representation against existing records. Automatic milestone roll-up, dependencies and minimum-session policies are deferred. |
+| Current contracts | Review the smallest goal-plan/checkpoint and standalone persistent to-do/done-undone representation against existing records. Preserve legacy progress code and data while hiding its UI. Automatic milestone roll-up, dependencies and minimum-session policies are deferred. |
 | Navigator details | Review Section 4.1's Phase 3 depth; historical retrieval, richer roadmaps and Sketch Journal remain Phase 4 until separately scoped. |
 | Trajectory review rules | Define which edits count as important goal or commitment changes, how current priorities supersede older decisions, and what the user sees when a detour reaches its review date. AI-proposed important changes always require confirmation. |
 | Memory and deletion boundaries | Define stored context categories, retention, deletion completion expectations, and treatment of derived summaries or copies. Corrected or deleted information must cease influencing advice once the change completes; no complete chat archive is assumed. |
 | Delivery constraints | Confirm development timeframe, budget, target platform, and available hardware or hosted inference access. These constrain feasible scope and architecture. |
 | User and hosting model | Local single-user Phase 1 is confirmed. Hosted/multi-user access needs separate scope, security and deployment decisions. |
-| Deadline semantics | The four options are confirmed. Decide the duration anchor (entry or planning day), calendar-day versus elapsed-time interpretation, timezone/day boundary, due-time boundary, overdue behavior and explicit deadline edits. No automatic daily deadline reset. |
-| Daily-plan lifecycle | Decide proposal/history retention, replacement/acceptance rules, progress detail and available-time/allocation units. These do not require time-slot scheduling or recurring commitments. |
+| Deadline semantics | The four options, local calendar-day measurement and task-creation-day anchor are confirmed. Part 2 defaults for review: computer-local creation day saved once; due date inclusive; overdue label on unfinished tasks the following day; explicit edits keep the original anchor. No automatic daily deadline reset. |
+| Daily-plan lifecycle | Decide proposal/history retention, replacement/acceptance rules and available-time/allocation units for the planned daily planner. Only done/undone status is in scope; detailed progress remains deferred. These decisions do not require time-slot scheduling or recurring commitments. |
 | Deferred progress and forecasting | Rich units, remaining-effort updates, milestone roll-up, minimum history, capacity assumptions and uncertainty remain open for later scope, not current prerequisites. |
 | AI and stack | Python, Flask/Jinja, SQLite/sqlite3, Pydantic and pytest are approved. Running.md and Model_Verification.json record existing model/runtime evidence; challenge eligibility and broader quality require separate verification. |
 | Data handling | Determine what information is sent to inference services and how it is stored and retained before making privacy claims. |

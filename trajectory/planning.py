@@ -1,7 +1,7 @@
 """Coordinate inference without holding a database transaction open."""
 from uuid import UUID
 from . import storage, draft_storage
-from .clarification import questions_for, FLAGS
+from .clarification import FLAGS
 
 
 class DraftConflict(Exception):
@@ -16,8 +16,6 @@ def generate_draft(goal_id, revision, request_id, adapter):
     goal = storage.find_goal(goal_id)
     if goal is None or goal["revision"] != revision:
         raise DraftConflict("The goal changed. Review its saved context before generating.")
-    if questions_for(goal):
-        raise DraftConflict("Clarify the remaining goal details first. Explicit unknowns are allowed.")
     existing = draft_storage.find_draft(request_id)
     if existing is not None:
         if existing["goal_id"] != goal_id or existing["source_revision"] != revision:

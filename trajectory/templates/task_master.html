@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+{% block title %}Task Master - Trajectory{% endblock %}
+{% block content %}
+<div class="page-intro">
+  <div><p class="eyebrow">Your everyday work</p><h1>Task Master</h1><p class="muted">Keep your to-dos in one place.</p></div>
+  <a class="button" href="{{ url_for('task_master.edit') }}">New task</a>
+</div>
+{% if error %}<div class="notice" role="alert">{{ error }}</div>{% endif %}
+{% if tasks is not none %}
+{% if notice %}<p class="notice" role="status">{{ notice }}</p>{% endif %}
+<section class="task-list" aria-labelledby="tasks-heading">
+  <h2 id="tasks-heading">Your tasks <span class="count">{{ tasks|length }}</span></h2>
+  {% for task in tasks %}
+  <article class="work-entry" aria-labelledby="task-{{ task.id }}">
+    <h3 id="task-{{ task.id }}">{{ task.title }}</h3>
+    {% if task.description %}<p class="preserve">{{ task.description }}</p>{% endif %}
+    <p class="muted">Status: <strong>{{ 'Done' if task.status == 'done' else 'Undone' }}</strong></p>
+    {% include '_task_deadline.html' %}
+    <div class="form-actions">
+      <form method="post" action="{{ url_for('task_master.status', task_id=task.id) }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <input type="hidden" name="revision" value="{{ task.revision }}">
+        <input type="hidden" name="status" value="{{ 'undone' if task.status == 'done' else 'done' }}">
+        <button type="submit" class="secondary" aria-label="{{ 'Mark undone' if task.status == 'done' else 'Mark done' }}: {{ task.title }}">{{ 'Mark undone' if task.status == 'done' else 'Mark done' }}</button>
+      </form>
+      <a class="button secondary" href="{{ url_for('task_master.edit', task_id=task.id) }}" aria-label="Edit task: {{ task.title }}">Edit task</a>
+      <a class="text-link" href="{{ url_for('task_master.delete', task_id=task.id) }}" aria-label="Delete task: {{ task.title }}">Delete task</a>
+    </div>
+  </article>
+  {% else %}
+  <div class="task-empty"><h3>What needs doing?</h3><p class="muted">Add your first task. A title is enough to get started.</p></div>
+  {% endfor %}
+</section>
+{% endif %}
+{% endblock %}

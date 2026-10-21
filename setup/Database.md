@@ -1,6 +1,6 @@
 ﻿# Trajectory — Database Proposal
 
-> **Status: Proposed data catalogue for review, not a description of the implemented schema.** Running.md describes the current SQLite tables; this update creates no migrations.
+> **Status: Task Master Parts 1 and 2 storage are implemented; the cross-phase catalogue remains proposed.** Running.md records migrations 3/4 and verification. Completion controls and creation-based deadlines are implemented; daily proposals remain pending.
 > Based on `setup/Product.md` and the approved `setup/Architecture.md`. Approval of architecture does not resolve choices that it labels OPEN DECISION. This document creates no tables, migrations, code, or application files. `setup/Design.md` remains outside this alignment scope.
 
 ## 1. Read this first
@@ -9,7 +9,7 @@
 
 | Label | Meaning here |
 | --- | --- |
-| Current data boundary | Goal/checkpoint plans, persistent to-dos, daily proposals and recorded completion/progress. The simple daily planner is current; calendar windows/blocks, navigator context and forecasting are deferred. Catalogue detail is still a proposal. |
+| Current product boundary | Implemented goal/checkpoint plans, standalone to-do management, done/undone controls and deadlines; daily proposals remain pending. Legacy detailed progress is preserved but hidden. Calendar windows/blocks, navigator context and forecasting are deferred. Section 3.0 records the original standalone contract, extended by the Part 2 implementation notes below; other catalogue detail remains proposed. |
 | Proposed rule | A concrete recommendation that still needs review before implementation. |
 | Future | Not required for the initial schema; add only after scope approval. |
 | OPEN DECISION | A choice that affects data meaning or delivery and remains unsettled. |
@@ -36,7 +36,7 @@ flowchart LR
     P --> X[Deletion request status]
 ```
 
-Arrows show the main ownership/reference paths, not every FK. The tables below define this proposal only; they are not authoritative for the implemented schema. Personal context supports planning but never supplies authoritative numerical forecasts.
+Arrows show the main ownership/reference paths, not every FK. The cross-phase catalogue tables in Sections 3.1-3.12 remain proposals; Section 3.0 separately records the implemented standalone task contract. Personal context supports planning but never supplies authoritative numerical forecasts.
 
 ## 2. Shared conventions
 
@@ -53,15 +53,78 @@ Arrows show the main ownership/reference paths, not every FK. The tables below d
 
 ### Current relationships and remaining storage review
 
-Current persistence serves only Product.md Section 4's two features: goal plans with checkpoints, standalone or linked to-dos, daily proposals and recorded completion/progress. Tasks need stable identities across days and plans. Completed tasks remain recorded, unfinished tasks remain available and a new plan does not reset progress or duplicate tasks. Goal/milestone association is not required for a standalone to-do.
+Current implementation persists goal plans with checkpoints and goal-linked tasks; legacy detailed progress remains stored but hidden. Standalone task management, saved completion controls and deadlines are implemented for Task Master Parts 1 and 2; daily proposals remain pending Product.md Section 4 work. Section 3.0 specifies the standalone contract and implementation boundary. Tasks need stable identities across days and plans. Completed tasks remain recorded, unfinished tasks remain available and a new plan must not reset status or duplicate tasks. Goal/milestone association is not required for a standalone to-do.
 
-The four allowed deadline choices are owned by Product.md. Storage must preserve the user's choice and the agreed deadline meaning across replanning; it must not silently renew a duration each day. Whether to retain a duration, an anchor, a resolved date or a combination is OPEN DECISION, alongside timezone/day boundaries and overdue handling. No column, enum encoding or migration is selected here.
+The four allowed deadline choices are owned by Product.md. The task's creation day is the confirmed duration anchor, using local calendar days. Storage must preserve that origin across edits and replanning; it must not silently renew a duration each day. Part 2 stores a fixed local creation date plus a nullable 2/4/7-day duration; the resolved date is calculated from those saved fields. The Part 2 implementation notes below supersede the historical Part 1-only contract where applicable.
 
 Daily allocations are proposals distinct from persistent to-dos and actual progress. Available time does not require recurring windows, calendar integration or scheduled blocks. Decide minimal plan retention/replacement and completion/progress detail against existing storage; no daily-plan table set is approved by this update.
 
 Running.md documents existing proposal JSON, approved snapshots and task membership. Review compatibility with those records before any separately authorized migration. Lightweight checkpoint representation remains open; automatic milestone/checklist management, quantity roll-up, detailed blocker/time logs and forecasts are deferred.
 
-**Catalogue boundary:** Sections 3.1-3.12 and Sections 4-7 retain earlier schema/lifecycle proposals for reference, not a package to build now. Reuse relevant existing structures where sufficient. In particular, 3.6's recurring windows and 3.9's time-slot blocks are deferred; 3.7-3.8 are not the selected implementation for the simple daily planner. No new tables or modules are introduced.
+**Catalogue boundary:** Section 3.0 defines the minimum standalone contract used by Part 1. Sections 3.1-3.12 and Sections 4-7 retain earlier schema/lifecycle proposals for reference, not a package to build now; they do not override Section 3.0 for its standalone slice. Reuse relevant existing structures where sufficient. In particular, 3.6's recurring windows and 3.9's time-slot blocks are deferred; 3.7-3.8 are not the selected implementation for the simple daily planner. This documentation change creates no tables or modules.
+
+### 3.0 Task Master: minimum standalone task contract
+
+**Part 1 implementation - October 21, 2026:** The user authorized building the separately planned standalone task-management slice. Section 3.0's task fields, create/edit/removal behavior and additive migration 3 are implemented and verified using temporary databases. During the later authorized local startup, the personal database was backed up and migration 3 was applied; comparison with that backup confirmed all 12 existing data tables were unchanged. This is historical Part 1 evidence; the Part 2 implementation below adds done/undone actions and deadlines.
+
+**Scope and precedence:** This section defines the minimal standalone slice for P1.T1 and the simple status representation needed by P1.T2. It takes precedence over the retained catalogue's proposed task fields, common columns, profile ownership and deletion machinery for this slice only. It does not select that catalogue or the future daily-plan schema. Further Task Master parts require separate implementation authorization.
+
+#### Part 1 user input and stored fields (historical; Part 2 extension below)
+
+The creation/edit form asks only for a title and optional notes. Notes map to `description` in storage. No goal, milestone, effort estimate, priority or deadline is required by P1.T1; the full MVP's four deadline choices remain P1.T3 work with unresolved date semantics.
+
+Use one additive table, `standalone_tasks`, in the existing SQLite database:
+
+| Field | Storage contract | Meaning and authority |
+| --- | --- | --- |
+| `id` | TEXT primary key, non-null; application-generated UUID string | Immutable task identity, never reused or derived from its title. |
+| `title` | TEXT non-null; 1-160 characters after trimming | Required user-entered action. Duplicate titles are allowed; identity is the ID. |
+| `description` | TEXT non-null, default empty string; at most 1,200 characters after trimming | Optional user-entered notes. Missing/blank input becomes an empty string, not invented context. |
+| `status` | TEXT non-null, default `undone`; allowed values `undone` / `done` | Persistent completion state. P1.T1 creates tasks as undone and does not expose status edits; P1.T2 adds explicit done/undone actions. |
+| `revision` | INTEGER non-null, default 1; integer >= 1 | Server-managed optimistic concurrency token; increment on each successful edit or actual status change. |
+| `created_at` | TEXT non-null; canonical UTC timestamp | Server-assigned creation instant, preserved through edits and status changes. |
+| `updated_at` | TEXT non-null; same UTC timestamp format | Server-assigned latest change instant; initially equal to creation time. |
+
+Use the application's existing UTC timestamp format (`YYYY-MM-DDTHH:MM:SS.sssZ`). These timestamps do not define deadline anchors, a local timezone or planning days. This slice intentionally uses `revision` and empty optional description to match existing application conventions rather than adopting the catalogue's proposed `version` and nullable description.
+
+The task-input contract accepts only `title` and `description`; extra business fields are rejected. Form transport controls such as the CSRF token and expected revision are parsed separately. IDs, status and timestamps cannot be changed through the ordinary edit form. An edit preserves ID, creation time and status; it never creates a replacement task. Server validation and SQLite constraints enforce required text, length bounds, status values and integer revision bounds. Render all user text with escaping.
+
+P1.T2's status action carries the explicit desired state and expected revision, rather than a blind toggle. Marking done retains the row; undoing completion changes the same row back to undone. No daily reset, progress-entry dependency, completion-time history or analytics is introduced. No separate completion timestamp is needed for this contract.
+
+#### Storage compatibility and correction rules
+
+The current `approved_tasks.goal_id` is non-null, and approved snapshots, milestone links and hidden legacy work entries refer to that table. Making its goal optional would affect existing goal-scoped services and history. Use the separate table above for ordinary to-dos and reuse the existing SQLite connection and transaction helpers.
+
+- Do not modify, backfill, copy or relink existing goals, approved task rows, approved snapshots, milestone associations or preserved progress entries.
+- No goal/milestone FK, singleton profile, general work-item hierarchy or proposed catalogue table is needed for this local single-user slice.
+- Apply a reviewed, versioned additive migration only when implementation is authorized. Register its version in the existing migration mechanism; never recreate the live database or rewrite earlier migrations.
+- List stored standalone tasks directly in a deterministic order: newest creation first, then ID for equal timestamps. Editing or day changes do not duplicate or recreate tasks. Later status filtering must retain completed rows.
+- For edits, re-read the task and compare the expected revision within a short write transaction. Missing records and stale revisions return explicit feedback without inserting or overwriting anything.
+- Failures roll back the entire mutation and preserve saved data. Unsaved form values remain available for correction; an error must not be reported as a successful save.
+- Task revisions protect individual edits. Future daily proposals must also detect task additions and removals; the proposal input-set/version policy remains to be defined with P1.T5/P1.T6.
+
+#### Removal behavior
+
+**Delete means permanent removal from the live application database.** There is no archive, trash table, hidden deleted row or automatic expiry in this slice. Completion is separate: done tasks stay saved until the user explicitly deletes them.
+
+1. Start deletion from one identified standalone task. Show its title and whether it is done or undone, state that deletion is permanent, and require explicit confirmation. Cancel changes nothing; no bulk deletion is included.
+2. The confirmed mutation carries the task ID and expected revision and uses the application's CSRF protection. A read-only request or visiting the confirmation page cannot delete anything.
+3. In a short write transaction, re-read the record, check its revision and check for dependent records. A concurrent edit/status change rejects deletion and requires a fresh review.
+4. P1.T1/P1.T2 tasks have no dependent records. Delete the row physically and commit. A repeated request for an already absent ID reports that it is already absent and deletes nothing else; it never recreates a record.
+5. On database or dependency-check failure, roll back and report that deletion did not complete. Do not leave a hidden partially deleted record or claim success.
+6. Existing goal-linked tasks are outside this action. Never cascade from a standalone deletion into goals, milestones, approved plans or legacy progress.
+
+**Future dependency gate:** Before daily proposals or other records can reference standalone tasks, extend this removal contract in the same reviewed scope. Until affected records can be previewed and dependent copies/references can be handled atomically, reject deletion of a referenced task with an explanation. Do not silently cascade, retain deleted text in proposal/snapshot payloads, or treat unlinking as content removal. Daily proposal/history cleanup and retention remain open; this contract selects no historical-plan deletion policy.
+
+This is live-data deletion, not a promise about forensic erasure or backup expiry. Do not add raw task content to logs, audit copies or deletion manifests. The catalogue's later profile-wide deletion requests and summary cleanup are not prerequisites for deleting an independent row.
+
+#### Verification required when implementation is authorized
+
+Verify create/list/edit with title-only and optional notes; whitespace and length validation; rejection of extra fields; distinct identities for equal titles; persisted metadata across restart; stale edits; transaction rollback; and preservation of existing goal-plan/progress records after the additive migration.
+
+Verify confirmed/cancelled deletion, CSRF and mutation-method protection, stale deletion, repeated deletion, rollback and the absence of retained task content in live storage. P1.T2 additionally verifies done/undone persistence across restart and day changes, status preservation through ordinary edits, and no reset or task duplication. Referenced-task deletion cases become required when dependencies are introduced.
+
+Part 1 verification passed 39 new regression cases and all 138 tests in the full suite. Additive migration and failure tests used temporary databases. This was the Part 1 result. Part 2 adds P1.T2/P1.T3; P1.T4-P1.T7 remain unimplemented. See Running.md for browser checks and implementation limits.
 
 ### A. Personal trajectory and organized work
 
@@ -331,7 +394,7 @@ Later tests must cover FK enforcement per connection, invalid values/relationshi
 
 | Data by phase; detailed schema still proposed | Future only; no tables proposed now |
 | --- | --- |
-| Current: goal/checkpoint plans, persistent to-dos, daily proposals, completion/progress; representation pending review | External calendar sync and rich recurrence/exceptions |
+| Current product: goal/checkpoint plans and standalone task management implemented; daily proposals still pending contract review | External calendar sync and rich recurrence/exceptions |
 | Deferred Phase 2: recurring time rules and scheduled blocks, broader commitments and advanced forecasting | Multi-day roadmap graphs and historical forecast snapshots |
 | Phase 3: multiple interests, preferences, confirmed decisions/detours and approved summaries | Broad conversation/note retrieval and embedding indexes |
 | Temporary exact-change proposals and deletion status | Collaboration, accounts, permissions and multiple users |
@@ -344,13 +407,23 @@ No persistent “distraction score” or automatic career-path classification is
 | OPEN DECISION | Recommendation to review |
 | --- | --- |
 | Later deployment | Local single-user scope is confirmed; the singleton profile remains a schema proposal. Hosted multi-user access needs revised ownership/authentication approval. |
-| Current relationships | Review minimal goal/checkpoint, stable to-do, daily-proposal and completion/progress representations against existing storage. No automatic milestone management or new table set is selected. |
-| To-do deadlines | Decide anchor, calendar-day/elapsed interpretation, timezone/day and due-time boundaries, overdue behavior and explicit changes before choosing a storage encoding. |
-| Current progress | Decide minimum completion/progress detail and correction behavior. Rich measurement units, forecast evidence and milestone roll-up are later decisions. |
+| Current relationships | Section 3.0's standalone table and initial undone status are implemented for Part 1. Part 2 status controls and deadlines are implemented; daily-plan relationships remain pending. Existing goal/checkpoint storage is preserved; daily-proposal relationships remain open. No automatic milestone management or full catalogue is selected. |
+| To-do deadlines | Local calendar-day measurement is confirmed. The duration starts on the day the task is added (confirmed October 21, 2026). Part 2 uses the computer-local creation date plus nullable 2/4/7-day duration, an inclusive due date and overdue display on unfinished tasks the following day; explicit edits retain the original creation day. |
+| Current completion | Section 3.0 specifies persistent done/undone with explicit desired-state changes for P1.T2, without detailed work entries. Implemented by Part 2. Rich measurement units, forecast evidence and milestone roll-up are deferred. |
 | Deferred time semantics | Weekly/one-off recurrence, midnight splitting, DST scheduling policy and parent/task deadline precedence are not current prerequisites. |
 | Plan lifecycle | Review goal-plan acceptance plus daily-proposal retention/replacement, stable task references and recorded progress. One accepted plan/date remains a proposal, not a selected rule. Dependency/minimum-session policies are deferred. |
 | Context structure | Typed shared context table; approve important-change boundaries, summary provenance and review-date behavior. |
-| Retention/deletion | Approve proposal expiry, historical-record deletion choices, completed request metadata retention, backup expiry and external-provider handling. |
+| Retention/deletion | Section 3.0 defines confirmed permanent removal for independent standalone tasks and blocks referenced-task deletion until dependency cleanup is reviewed and implemented. Proposal expiry, historical-record cleanup, backup expiry and external-provider handling remain open. |
 | Persistence setup | Confirm SQLite on the actual deployment storage, supported version, migrations and durable backup/restore process. |
 
 Technical references checked on 2026-10-18. Exact SQL constraints and dependency versions must be verified during implementation. This document proposes data responsibilities; visual design, routes, model selection, forecast formulas and challenge compliance remain governed by their respective approved or pending documents.
+
+## Task Master Part 2 implementation - October 21, 2026
+
+This authorized slice supersedes the historical Part 1-only status/deadline statements in Section 3.0. Migration 4 transactionally rebuilds only `standalone_tasks` with its original columns/constraints and two additional fields: `created_on` (required valid ISO calendar date) and `deadline_days` (nullable integer restricted to 2, 4 or 7). No dependent tables refer to standalone tasks in Parts 1 and 2. Future references require a new reviewed migration/deletion policy.
+
+Creation captures the UTC instant and local calendar date from the same reading of the computer's clock. The original local date is immutable in application workflows. Existing rows retain every original value; migration derives their local day from `created_at` in the computer's timezone at upgrade and assigns no deadline. The original timezone was not stored in Part 1. The due date is derived as `created_on + deadline_days`, avoiding a second mutable copy. It remains valid through the end of that calendar day; only unfinished work is labelled overdue on following days.
+
+The ordinary input model now additionally accepts `deadline` with exact string values `none`, `2`, `4` or `7`. Omitted deadline on an edit preserves the saved choice. An explicit choice change uses the original creation date, including when that produces an already overdue date. Status remains separate: explicit desired-state POSTs serialize and check the expected revision; actual state changes increment revision, while a fresh no-op does not write. Completion preserves the task, notes, creation day and deadline. Failures roll back, and stale edits/deletions/status requests cannot replace newer work.
+
+The computer-local source, inclusive due date and overdue label are Part 2 implementation defaults presented for review, rather than a new hosted-user timezone policy. Daily-plan persistence, inference, retention and task-reference cleanup remain unimplemented Parts 3 and 4.

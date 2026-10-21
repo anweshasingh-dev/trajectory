@@ -56,9 +56,11 @@ def current(app, goal_url):
         return review_storage.current_plan(goal_url.rsplit('/', 1)[1])
 
 
-def test_edit_then_approve_exact_revision_and_restart(app):
+@pytest.mark.parametrize("minimal_context", [False, True])
+def test_edit_then_approve_exact_revision_and_restart(app, minimal_context):
     client = app.test_client()
-    url, draft_id = draft_for(client, app)
+    goal_url = submit(client).location.split("?")[0] if minimal_context else None
+    url, draft_id = draft_for(client, app, goal_url)
     assert client.get(f'{url}/drafts/{draft_id}/edit').status_code == 200
     assert edit_draft(client, url, draft_id, m0_t0_title='Inspect missing values').status_code == 303
     assert current(app, url) is None
